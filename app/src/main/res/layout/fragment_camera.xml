@@ -4,28 +4,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CameraActivity">
+    tools:context=".CameraActivity"
+    >
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:background="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        android:background="@color/black">
+        >
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_width="82dp"
-            android:layout_height="73dp"
-            app:backgroundTint="#FF0000"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="78dp"
+            android:layout_height="78dp"
+            android:background="@drawable/btn_background"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintVertical_bias="0.5">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/recordBtn"
+                android:layout_width="66dp"
+                android:layout_height="66dp"
+                app:backgroundTint="#FF0000"
+                app:flow_horizontalAlign="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
