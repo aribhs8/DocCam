@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 // Todo: Camera bug - After allowing permission the camera does not open. You need to restart for the camera to appear.
+// Todo: Camera needs to link with storage system (yet to be made).
 
 public class CameraFragment extends Fragment
 {
