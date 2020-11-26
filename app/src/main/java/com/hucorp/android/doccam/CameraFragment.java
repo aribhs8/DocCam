@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,6 +25,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.Arrays;
@@ -43,6 +45,9 @@ public class CameraFragment extends Fragment
     private Context mContext;
     private PreviewView mViewFinder;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
+    private FloatingActionButton recordBtn;
+    private ImageButton streamBtn;
+    private ImageButton fileBtn;
 
     public static CameraFragment newInstance()
     {
@@ -63,6 +68,9 @@ public class CameraFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
 
         mViewFinder = (PreviewView) v.findViewById(R.id.viewFinder);
+        recordBtn = v.findViewById(R.id.recordBtn);
+        streamBtn = v.findViewById(R.id.streamBtn);
+        fileBtn = v.findViewById(R.id.fileView);
 
         if (allPermissionsGranted())
         {
@@ -72,6 +80,28 @@ public class CameraFragment extends Fragment
         {
             ActivityCompat.requestPermissions(getActivity(), REQUIRED_PERMISSIONS.toArray(new String[0]), REQUEST_CODE_PERMISSIONS);
         }
+
+        recordBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mContext, "Record test", Toast.LENGTH_SHORT).show();;
+            }
+        });
+
+        streamBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mContext, "Button is disabled", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        fileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mContext, "Open file system", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
         return v;
     }
