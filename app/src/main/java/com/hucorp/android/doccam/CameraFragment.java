@@ -91,7 +91,8 @@ public class CameraFragment extends Fragment
         streamBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "Button is disabled", Toast.LENGTH_SHORT).show();
+                SettingsFragment settings = SettingsFragment.newInstance();
+                getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
             }
         });
 
