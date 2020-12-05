@@ -49,6 +49,10 @@ public class CameraFragment extends Fragment
     private ImageButton streamBtn;
     private ImageButton fileBtn;
 
+    //Top bar
+    private ImageButton timerBtn;
+
+
     public static CameraFragment newInstance()
     {
         return new CameraFragment();
@@ -101,6 +105,21 @@ public class CameraFragment extends Fragment
                 Toast.makeText(mContext, "Open file system", Toast.LENGTH_SHORT).show();
             }
         });
+
+
+
+        //Top bar
+        timerBtn = v.findViewById(R.id.timer);
+
+        timerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mContext, "Open file system", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
 
 
         return v;
