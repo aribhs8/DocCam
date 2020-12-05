@@ -3,6 +3,7 @@ package com.hucorp.android.doccam;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
@@ -51,6 +52,7 @@ public class CameraFragment extends Fragment
 
     //Top bar
     private ImageButton timerBtn;
+    private ImageButton settingsBtn;
 
 
     public static CameraFragment newInstance()
@@ -75,6 +77,7 @@ public class CameraFragment extends Fragment
         recordBtn = v.findViewById(R.id.recordBtn);
         streamBtn = v.findViewById(R.id.streamBtn);
         fileBtn = v.findViewById(R.id.fileView);
+        settingsBtn = v.findViewById(R.id.settings);
 
         if (allPermissionsGranted())
         {
@@ -95,7 +98,7 @@ public class CameraFragment extends Fragment
         streamBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "Button is disabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, "Disabled", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -118,6 +121,13 @@ public class CameraFragment extends Fragment
             }
         });
 
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(i);
+            }
+        });
 
 
 
