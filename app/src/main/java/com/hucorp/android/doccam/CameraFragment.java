@@ -3,6 +3,7 @@ package com.hucorp.android.doccam;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.os.Bundle;
@@ -91,8 +92,8 @@ public class CameraFragment extends Fragment
         streamBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SettingsFragment settings = SettingsFragment.newInstance();
-                getFragmentManager().beginTransaction().replace(R.id.fragment_container, settings).commit();
+                Intent i = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(i);
             }
         });
 
