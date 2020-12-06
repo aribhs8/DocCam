@@ -1,11 +1,14 @@
-package com.hucorp.android.doccam.fragments;
+package com.hucorp.android.doccam;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -25,8 +28,6 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.hucorp.android.doccam.R;
-import com.hucorp.android.doccam.activities.RecordingListActivity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +50,11 @@ public class CameraFragment extends Fragment
     private ImageButton streamBtn;
     private ImageButton mFileBtn;
 
+    //Top bar
+    private ImageButton timerBtn;
+    private ImageButton settingsBtn;
+
+
     public static CameraFragment newInstance()
     {
         return new CameraFragment();
@@ -70,7 +76,8 @@ public class CameraFragment extends Fragment
         mViewFinder = (PreviewView) v.findViewById(R.id.viewFinder);
         recordBtn = v.findViewById(R.id.recordBtn);
         streamBtn = v.findViewById(R.id.streamBtn);
-        mFileBtn = (ImageButton) v.findViewById(R.id.fileView);
+        mFileBtn = v.findViewById(R.id.fileView);
+        settingsBtn = v.findViewById(R.id.settings);
 
         if (allPermissionsGranted())
         {
@@ -98,10 +105,32 @@ public class CameraFragment extends Fragment
         mFileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), RecordingListActivity.class);
-                startActivity(intent);
+                Toast.makeText(mContext, "Open file system", Toast.LENGTH_SHORT).show();
             }
         });
+
+
+
+        //Top bar
+        timerBtn = v.findViewById(R.id.timer);
+
+        timerBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mContext, "Open file system", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        settingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getActivity(), SettingsActivity.class);
+                startActivity(i);
+            }
+        });
+
+
+
 
         return v;
     }
