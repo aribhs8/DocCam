@@ -1,14 +1,11 @@
-package com.hucorp.android.doccam;
+package com.hucorp.android.doccam.fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.SurfaceTexture;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -28,6 +25,9 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hucorp.android.doccam.R;
+import com.hucorp.android.doccam.activities.RecordingListActivity;
+import com.hucorp.android.doccam.activities.SettingsActivity;
 
 import java.util.Arrays;
 import java.util.List;
@@ -105,7 +105,8 @@ public class CameraFragment extends Fragment
         mFileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "Open file system", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), RecordingListActivity.class);
+                startActivity(intent);
             }
         });
 

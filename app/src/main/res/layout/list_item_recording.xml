@@ -1,8 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-    <Button
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        tools:text="Sound name"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:cardElevation="5dp"
+        app:cardCornerRadius="10dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/share_recording"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recording_title"
+                    android:textSize="24sp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recording_quality" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/date" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/share_recording"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/previewBitmap"
+                android:layout_marginEnd="25dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_baseline_share_24"
+                android:contentDescription="@string/share_description" />
+
+            <!-- This is a temporary image that needs to be changed once bitmap implemented -->
+            <ImageView
+                android:id="@+id/previewBitmap"
+                android:layout_width="76dp"
+                android:layout_height="76dp"
+                android:src="@drawable/ic_baseline_source_24"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:contentDescription="@string/recording_title"/>
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
 </layout>
