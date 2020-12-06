@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">DocCam</string>
+    <string name="recording_title">Recording 1</string>
+    <string name="recording_quality">1080p | 60fps</string>
+    <string name="date">Date</string>
+    <string name="share_description">Share Recording</string>
 </resources>

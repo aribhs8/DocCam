@@ -4,17 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CameraActivity">
+    tools:context=".activities.CameraActivity"
+    >
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
-        android:layout_width="420dp"
-        android:layout_height="505dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="103dp"
+        android:layout_width="425dp"
+        android:layout_height="565dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.454"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
         app:layout_constraintVertical_bias="1.0">
@@ -22,13 +21,14 @@
     </androidx.camera.view.PreviewView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:background="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:id="@+id/bottomBar"
+        >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout2"
@@ -71,18 +71,19 @@
                 android:id="@+id/fileView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@drawable/gallery_icon" />
+                android:background="@drawable/gallery_icon"/>
 
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
             android:layout_width="54dp"
             android:layout_height="54dp"
-            app:cardCornerRadius="28dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:cardCornerRadius="28dp"
+            >
 
             <ImageButton
                 android:id="@+id/streamBtn"
