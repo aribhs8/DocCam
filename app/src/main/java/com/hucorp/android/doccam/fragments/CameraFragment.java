@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,13 +47,13 @@ public class CameraFragment extends Fragment
     private Context mContext;
     private PreviewView mViewFinder;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
-    private FloatingActionButton recordBtn;
-    private ImageButton streamBtn;
+    private FloatingActionButton mRecordBtn;
+    private ImageButton mStreamBtn;
     private ImageButton mFileBtn;
 
     //Top bar
-    private ImageButton timerBtn;
-    private ImageButton settingsBtn;
+    private ImageButton mTimerBtn;
+    private ImageButton mSettingsBtn;
 
 
     public static CameraFragment newInstance()
@@ -74,10 +75,10 @@ public class CameraFragment extends Fragment
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
 
         mViewFinder = (PreviewView) v.findViewById(R.id.viewFinder);
-        recordBtn = v.findViewById(R.id.recordBtn);
-        streamBtn = v.findViewById(R.id.streamBtn);
+        mRecordBtn = v.findViewById(R.id.recordBtn);
+        mStreamBtn = v.findViewById(R.id.streamBtn);
         mFileBtn = v.findViewById(R.id.fileView);
-        settingsBtn = v.findViewById(R.id.settings);
+        mSettingsBtn = v.findViewById(R.id.settings);
 
         if (allPermissionsGranted())
         {
@@ -85,17 +86,17 @@ public class CameraFragment extends Fragment
         }
         else
         {
-            ActivityCompat.requestPermissions(getActivity(), REQUIRED_PERMISSIONS.toArray(new String[0]), REQUEST_CODE_PERMISSIONS);
+            requestPermissions(REQUIRED_PERMISSIONS.toArray(new String[0]), REQUEST_CODE_PERMISSIONS);
         }
 
-        recordBtn.setOnClickListener(new View.OnClickListener() {
+        mRecordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(mContext, "Record test", Toast.LENGTH_SHORT).show();;
             }
         });
 
-        streamBtn.setOnClickListener(new View.OnClickListener() {
+        mStreamBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(mContext, "Button is disabled", Toast.LENGTH_SHORT).show();
@@ -110,28 +111,23 @@ public class CameraFragment extends Fragment
             }
         });
 
-
-
         //Top bar
-        timerBtn = v.findViewById(R.id.timer);
+        mTimerBtn = v.findViewById(R.id.timer);
 
-        timerBtn.setOnClickListener(new View.OnClickListener() {
+        mTimerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(mContext, "Open file system", Toast.LENGTH_SHORT).show();
             }
         });
 
-        settingsBtn.setOnClickListener(new View.OnClickListener() {
+        mSettingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(getActivity(), SettingsActivity.class);
                 startActivity(i);
             }
         });
-
-
-
 
         return v;
     }
@@ -140,10 +136,13 @@ public class CameraFragment extends Fragment
     public void onRequestPermissionsResult(int requestCode, String[] permissions, @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d(TAG, "I am at least here");
         if (requestCode == REQUEST_CODE_PERMISSIONS)
         {
+            Log.d(TAG, "I am now here");
             if (allPermissionsGranted())
             {
+                Log.d(TAG, "permission granted should startCamera()");
                 startCamera();;
             }
             else
