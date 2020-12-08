@@ -54,6 +54,7 @@ public class CameraFragment extends Fragment
     //Top bar
     private ImageButton mTimerBtn;
     private ImageButton mSettingsBtn;
+    private ImageButton mflash;
 
 
     public static CameraFragment newInstance()
@@ -180,10 +181,13 @@ public class CameraFragment extends Fragment
         preview.setSurfaceProvider(mViewFinder.getSurfaceProvider());
 
         Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner)getActivity(), cameraSelector, preview);
+
     }
 
     private boolean allPermissionsGranted()
     {
         return ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
+
+
 }
