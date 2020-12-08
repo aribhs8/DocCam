@@ -26,11 +26,14 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.hucorp.android.doccam.CameraLab;
 import com.hucorp.android.doccam.R;
+import com.hucorp.android.doccam.Recording;
 import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -93,7 +96,12 @@ public class CameraFragment extends Fragment
         mRecordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "Record test", Toast.LENGTH_SHORT).show();;
+                Recording recording = new Recording();
+                CameraLab lab = CameraLab.get(getActivity());
+                recording.setTitle("Recording " + ((int) lab.getNumberOfRecordings()+1));
+                recording.setDate(new Date());
+                lab.addRecording(recording);
+                Toast.makeText(mContext, recording.getTitle() + " created", Toast.LENGTH_SHORT).show();;
             }
         });
 
@@ -137,13 +145,10 @@ public class CameraFragment extends Fragment
     public void onRequestPermissionsResult(int requestCode, String[] permissions, @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.d(TAG, "I am at least here");
         if (requestCode == REQUEST_CODE_PERMISSIONS)
         {
-            Log.d(TAG, "I am now here");
             if (allPermissionsGranted())
             {
-                Log.d(TAG, "permission granted should startCamera()");
                 startCamera();;
             }
             else

@@ -9,6 +9,17 @@ public class Recording
     private String mTitle;
     private Date mDate;
 
+    public Recording()
+    {
+        this(UUID.randomUUID());
+    }
+
+    public Recording(UUID ID)
+    {
+        mID = ID;
+        mDate = new Date();
+    }
+
     public UUID getID()
     {
         return mID;
