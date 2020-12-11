@@ -1,12 +1,12 @@
 package com.hucorp.android.doccam.fragments;
 
 import android.Manifest;
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -17,146 +17,166 @@ import androidx.annotation.Nullable;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.Preview;
-import androidx.camera.core.VideoCapture;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.hucorp.android.doccam.CameraLab;
+import com.hucorp.android.doccam.Constants;
 import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.Recording;
 import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+
+// Todo: Check copied over camera code with that of documentation; Can I simplify any camera code?
+// Todo: Incorporate video recording code before simplifying camera code
+// Todo: I can't move permissions code to another file but can I move the camera methods to an interface or something?
 
 public class CameraFragment extends Fragment
 {
-    // Constants
-    private static final String TAG = "CameraXBasic";
-    private static final int REQUEST_CODE_PERMISSIONS = 10;
-    private static final List<String> REQUIRED_PERMISSIONS = Arrays.asList(Manifest.permission.CAMERA);
-
-    private Context mContext;
+    // Layout elements
     private PreviewView mViewFinder;
-    private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
-    private FloatingActionButton mRecordBtn;
-    private ImageButton mStreamBtn;
-    private ImageButton mFileBtn;
-
-    //Top bar
-    private ImageButton mTimerBtn;
+    private ImageButton mCaptureBtn;
+    private ImageButton mLeftBtn;
     private ImageButton mSettingsBtn;
-    private ImageButton mflash;
+    private ImageButton mFlashBtn;
 
-    private boolean mStartRecording;
+    // Camera control
+    private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
+    private boolean mIsRecording;
+    public boolean mFlash;
 
-    public static CameraFragment newInstance()
-    {
-        return new CameraFragment();
-    }
+    public static CameraFragment newInstance() { return new CameraFragment(); }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mContext = getContext();
+        mIsRecording = false;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        mStartRecording = false;
-        VideoCapture videoCapture;
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
 
+        // Initialize layout elements
         mViewFinder = (PreviewView) v.findViewById(R.id.viewFinder);
-        /*mRecordBtn = v.findViewById(R.id.recordBtn);
-        mStreamBtn = v.findViewById(R.id.streamBtn);
-        mFileBtn = v.findViewById(R.id.fileView);
-        mSettingsBtn = v.findViewById(R.id.settings);
+        mCaptureBtn = (ImageButton) v.findViewById(R.id.captureBtn);
+        mLeftBtn = (ImageButton) v.findViewById(R.id.left_cameraBtn);
+        mSettingsBtn = (ImageButton) v.findViewById(R.id.settingsBtn);
+        mFlashBtn = (ImageButton) v.findViewById(R.id.flashBtn);
 
-        if (allPermissionsGranted())
-        {
-            startCamera();
-        }
-        else
-        {
-            requestPermissions(REQUIRED_PERMISSIONS.toArray(new String[0]), REQUEST_CODE_PERMISSIONS);
-        }
+        initCamera();               // Check for permissions and start camera
+        controlCameraBarInput();    // Poll for user input on camera bar
+        controlAppBarInput();       // Poll for user input in app bar
 
-        mRecordBtn.setOnClickListener(new View.OnClickListener() {
+        return v;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void controlCameraBarInput()
+    {
+        mCaptureBtn.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
-            public void onClick(View v) {
-                if (mStartRecording)
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                switch (event.getAction())
                 {
-                    mStartRecording = false;
-                    Recording recording = new Recording();
+                    case MotionEvent.ACTION_DOWN:
+                        mCaptureBtn.setAlpha(0.5f);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        mCaptureBtn.setAlpha(1.0f);
+                        break;
+                }
+                return false;
+            }
+        });
+
+        mCaptureBtn.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (mIsRecording)
+                {
+                    mIsRecording = false;
+                    mLeftBtn.setEnabled(true);
+
                     CameraLab lab = CameraLab.get(getActivity());
-                    recording.setTitle("Recording " + ((int) lab.getNumberOfRecordings()+1));
-                    recording.setDate(new Date());
+                    Recording recording = new Recording(lab.getNumberOfRecordings()+1);
                     lab.addRecording(recording);
-                    Toast.makeText(mContext, recording.getTitle() + " created", Toast.LENGTH_SHORT).show();;
+
+                    mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
+                    Toast.makeText(getContext(), recording.getTitle() + " created", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
-                    mStartRecording = true;
-                    Toast.makeText(mContext, "Recording started", Toast.LENGTH_SHORT).show();
+                    mIsRecording = true;
+                    mLeftBtn.setEnabled(false);
+                    mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
+                    Toast.makeText(getContext(), "Capture button has been placed in record mode", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        mStreamBtn.setOnClickListener(new View.OnClickListener() {
+        mLeftBtn.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                Toast.makeText(mContext, "Button is disabled", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        mFileBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 Intent intent = new Intent(getActivity(), RecordingListActivity.class);
                 startActivity(intent);
             }
         });
+    }
 
-        //Top bar
-        mTimerBtn = v.findViewById(R.id.timer);
-
-        mTimerBtn.setOnClickListener(new View.OnClickListener() {
+    private void controlAppBarInput()
+    {
+        mSettingsBtn.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                Toast.makeText(mContext, "Open file system", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        mSettingsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 Intent i = new Intent(getActivity(), SettingsActivity.class);
                 startActivity(i);
             }
         });
-*/
-        return v;
+
+        mFlashBtn.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (mFlash)
+                {
+                    mFlash = false;
+                    mFlashBtn.setImageResource(R.drawable.flash);
+                }
+                else
+                {
+                    mFlash = true;
+                    mFlashBtn.setImageResource(R.drawable.flashoff);
+                }
+            }
+        });
+
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, @NonNull int[] grantResults)
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_PERMISSIONS)
+        if (requestCode == Constants.REQUEST_CODE_PERMISSIONS)
         {
             if (allPermissionsGranted())
             {
@@ -164,25 +184,36 @@ public class CameraFragment extends Fragment
             }
             else
             {
-                Toast.makeText(mContext, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
-                // *finish* activity
+                Toast.makeText(getContext(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
+                // Todo: Open a dialog here that tells the user they cannot use app without permission (remove Toast)
             }
+        }
+    }
+
+    private void initCamera()
+    {
+        if (allPermissionsGranted())
+        {
+            startCamera();
+        } else
+        {
+            requestPermissions(Constants.REQUIRED_PERMISSIONS.toArray(new String[0]), Constants.REQUEST_CODE_PERMISSIONS);
         }
     }
 
     private void startCamera()
     {
-        cameraProviderFuture = ProcessCameraProvider.getInstance(mContext);
+        mCameraProviderFuture = ProcessCameraProvider.getInstance(Objects.requireNonNull(getContext()));
 
-        cameraProviderFuture.addListener(() -> {
+        mCameraProviderFuture.addListener(() -> {
             try {
-                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+                ProcessCameraProvider cameraProvider = mCameraProviderFuture.get();
                 bindPreview(cameraProvider);
             } catch (ExecutionException | InterruptedException e) {
                 // No errors need to be handled for this Future.
                 // This should never be reached.
             }
-        }, ContextCompat.getMainExecutor(mContext));
+        }, ContextCompat.getMainExecutor(getContext()));
     }
 
     private void bindPreview(@NonNull ProcessCameraProvider cameraProvider)
@@ -196,11 +227,11 @@ public class CameraFragment extends Fragment
 
         preview.setSurfaceProvider(mViewFinder.getSurfaceProvider());
 
-        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner)getActivity(), cameraSelector, preview);
+        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) Objects.requireNonNull(getActivity()), cameraSelector, preview);
     }
 
     private boolean allPermissionsGranted()
     {
-        return ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 }

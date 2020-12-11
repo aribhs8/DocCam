@@ -5,4 +5,6 @@
     <string name="date">Date</string>
     <string name="share_description">Share Recording</string>
     <string name="capture_button">Capture Button</string>
+    <string name="left_camera_button">View/Pause Recordings (depending on mode)</string>
+    <string name="stream_button">Stream</string>
 </resources>

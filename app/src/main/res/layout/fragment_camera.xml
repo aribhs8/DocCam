@@ -2,7 +2,7 @@
 
 <!-- Todo: Add hex colors to style -->
 <!-- Todo: Change colors to use styles-->
-<!-- Todo: Change some of the id names -->
+<!-- Todo: Create drawable resources for differing screen sizes -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -12,62 +12,115 @@
     android:layout_height="match_parent"
     tools:context=".activities.CameraActivity">
 
-    <!-- Temporary Layout -->
-    <LinearLayout
-        android:id="@+id/appbar_layout"
+    <!-- Todo: This layout needs to use less defined numbers & incorporate more drawable resources -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
+        android:layout_height="54dp"
+        android:background="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@id/viewFinder"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/flashBtn"
+            android:layout_width="43dp"
+            android:layout_height="53dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            app:layout_constraintEnd_toStartOf="@+id/timerBtn"
+            app:layout_constraintHorizontal_bias="0.375"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/flashoff"
+            />
+
+        <ImageButton
+            android:id="@+id/settingsBtn"
+            android:layout_width="43dp"
+            android:layout_height="53dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.956"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/settings" />
+
+        <ImageButton
+            android:id="@+id/timerBtn"
+            android:layout_width="43dp"
+            android:layout_height="53dp"
+            android:adjustViewBounds="true"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            app:layout_constraintEnd_toStartOf="@+id/settingsBtn"
+            app:layout_constraintHorizontal_bias="0.19"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/timer" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/bottombar"
+        app:layout_constraintBottom_toTopOf="@id/cameraBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appbar_layout">
+        app:layout_constraintTop_toBottomOf="@+id/appbar">
 
     </androidx.camera.view.PreviewView>
 
-    <RelativeLayout
-        android:id="@+id/bottombar"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cameraBar"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/viewFinder"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/recordBtn"
+        <ImageButton
+            android:id="@+id/left_cameraBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_image_24"
+            android:scaleType="fitCenter"
+            android:background="@drawable/rounded_edges_button"
+            android:contentDescription="@string/left_camera_button"
+            app:layout_constraintEnd_toStartOf="@id/captureBtn"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <ImageButton
+            android:id="@+id/captureBtn"
             android:layout_width="78dp"
             android:layout_height="78dp"
-            android:backgroundTint="@color/white"
-            android:layout_centerInParent="true"
+            android:layout_marginBottom="17dp"
+            android:layout_marginTop="17dp"
+            android:background="@drawable/round_button"
+            android:focusable="true"
             android:src="@drawable/ic_baseline_fiber_manual_record_66"
-            android:contentDescription="@string/capture_button" />
+            android:contentDescription="@string/capture_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
 
         <ImageButton
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_baseline_image_24"
-            android:scaleType="centerInside"
-            android:background="@drawable/roundcorner"
-            android:layout_toStartOf="@id/recordBtn"
-            android:layout_centerVertical="true"
-            android:layout_marginEnd="50dp"/>
+            android:background="@drawable/round_button"
+            app:layout_constraintStart_toEndOf="@id/captureBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:contentDescription="@string/stream_button" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_image_24"
-            android:backgroundTint="@color/white"
-            android:layout_toEndOf="@id/recordBtn"
-            android:layout_marginStart="50dp"
-            android:layout_centerVertical="true" />
-
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
