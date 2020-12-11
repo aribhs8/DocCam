@@ -49,4 +49,9 @@ public class Recording
     {
         mDate = date;
     }
+
+    public String getPhotoFileName()
+    {
+        return "IMG_"+getID().toString() + ".jpg";
+    }
 }

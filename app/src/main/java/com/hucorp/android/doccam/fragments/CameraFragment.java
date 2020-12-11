@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,11 +17,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
@@ -37,28 +41,29 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-// Todo: Camera bug - After allowing permission the camera does not open. You need to restart for the camera to appear.
-// Todo: Camera needs to link with storage system (yet to be made).
-
 public class CameraFragment extends Fragment
 {
-    // constants
+    // Constants
     private static final String TAG = "CameraXBasic";
     private static final int REQUEST_CODE_PERMISSIONS = 10;
     private static final List<String> REQUIRED_PERMISSIONS = Arrays.asList(Manifest.permission.CAMERA);
 
+    // Control variables
     private Context mContext;
-    private PreviewView mViewFinder;
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
+    private boolean mIsRecording;
+
+    private PreviewView mViewFinder;
     private FloatingActionButton mRecordBtn;
     private ImageButton mStreamBtn;
     private ImageButton mFileBtn;
 
-    //Top bar
+    // Top bar
     private ImageButton mTimerBtn;
     private ImageButton mSettingsBtn;
     private ImageButton mflash;
 
+    private ImageCapture mImageCapture;
 
     public static CameraFragment newInstance()
     {
@@ -76,6 +81,7 @@ public class CameraFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
+        mIsRecording = false;
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
 
         mViewFinder = (PreviewView) v.findViewById(R.id.viewFinder);
@@ -96,12 +102,40 @@ public class CameraFragment extends Fragment
         mRecordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Recording recording = new Recording();
-                CameraLab lab = CameraLab.get(getActivity());
-                recording.setTitle("Recording " + ((int) lab.getNumberOfRecordings()+1));
-                recording.setDate(new Date());
-                lab.addRecording(recording);
-                Toast.makeText(mContext, recording.getTitle() + " created", Toast.LENGTH_SHORT).show();;
+                if (mIsRecording)
+                {
+                    mIsRecording = false;
+
+                    // Todo: Update Recording constructor
+                    Recording recording = new Recording();
+                    CameraLab lab = CameraLab.get(getActivity());
+                    recording.setTitle("Recording " + ((int) lab.getNumberOfRecordings()+1));
+                    recording.setDate(new Date());
+                    lab.addRecording(recording);
+
+                    ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(lab.getPhotoFile(recording)).build();
+                    mImageCapture.takePicture(outputFileOptions, ContextCompat.getMainExecutor(getContext()), new ImageCapture.OnImageSavedCallback()
+                    {
+                        @Override
+                        public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults)
+                        {
+                            Uri uri = FileProvider.getUriForFile(getActivity(), "com.hucorp.android.doccam.fileprovider", lab.getPhotoFile(recording));
+                            Log.d(TAG, "Photo capture succeeded: " + uri);
+                            Toast.makeText(mContext, recording.getTitle() + " created", Toast.LENGTH_SHORT).show();;
+                        }
+
+                        @Override
+                        public void onError(@NonNull ImageCaptureException exception)
+                        {
+
+                        }
+                    });
+                }
+                else
+                {
+                    mIsRecording = true;
+                    Toast.makeText(mContext, "Recording started", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -184,9 +218,9 @@ public class CameraFragment extends Fragment
                 .build();
 
         preview.setSurfaceProvider(mViewFinder.getSurfaceProvider());
+        mImageCapture = new ImageCapture.Builder().build();
 
-        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner)getActivity(), cameraSelector, preview);
-
+        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner)getActivity(), cameraSelector, preview, mImageCapture);
     }
 
     private boolean allPermissionsGranted()

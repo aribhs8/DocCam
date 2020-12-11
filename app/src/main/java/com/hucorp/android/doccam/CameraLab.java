@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.hucorp.android.doccam.database.RecordingBaseHelper;
 import com.hucorp.android.doccam.database.RecordingCursorWrapper;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -124,5 +125,11 @@ public class CameraLab
         values.put(RecordingTable.Cols.DATE, recording.getDate().getTime());
 
         return values;
+    }
+
+    public File getPhotoFile(Recording recording)
+    {
+        File filesDir = mContext.getFilesDir();
+        return new File(filesDir, recording.getPhotoFileName());
     }
 }

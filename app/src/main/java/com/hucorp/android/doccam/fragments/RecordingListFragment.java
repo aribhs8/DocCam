@@ -21,6 +21,7 @@ import com.hucorp.android.doccam.databinding.ListItemRecordingBinding;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
 import java.util.List;
 
 public class RecordingListFragment extends Fragment
@@ -59,6 +60,7 @@ public class RecordingListFragment extends Fragment
         private ListItemRecordingBinding mBinding;
         private TextView mTitleTextView;
         private TextView mDateTextView;
+        private File mPhotoFile;
 
         private RecordingHolder(ListItemRecordingBinding binding)
         {
@@ -71,6 +73,7 @@ public class RecordingListFragment extends Fragment
 
         public void bind(Recording recording)
         {
+            mPhotoFile = CameraLab.get(getActivity()).getPhotoFile((recording));
             mTitleTextView.setText(recording.getTitle());
             mDateTextView.setText(recording.getDate().toString());
         }
