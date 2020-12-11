@@ -1,101 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- Todo: Add hex colors to style -->
+<!-- Todo: Change colors to use styles-->
+<!-- Todo: Create drawable resources for differing screen sizes -->
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/black"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.CameraActivity">
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/viewFinder"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
-
-    </androidx.camera.view.PreviewView>
-
+    <!-- Todo: This layout needs to use less defined numbers & incorporate more drawable resources -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottomBar"
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:background="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout2"
-            android:layout_width="78dp"
-            android:layout_height="78dp"
-            android:background="@drawable/btn_background"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5">
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/recordBtn"
-                android:layout_width="66dp"
-                android:layout_height="66dp"
-                app:backgroundTint="#FF0000"
-                app:flow_horizontalAlign="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.5" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:backgroundTint="@color/white"
-            app:cardCornerRadius="15dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/constraintLayout2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageButton
-                android:id="@+id/fileView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/gallery_icon" />
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="54dp"
-            android:layout_height="54dp"
-            app:cardCornerRadius="28dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageButton
-                android:id="@+id/streamBtn"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white" />
-
-        </androidx.cardview.widget.CardView>
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
-        android:layout_width="0dp"
         android:layout_height="54dp"
-        android:layout_marginBottom="679dp"
         android:background="@android:color/black"
         app:layout_constraintTop_toBottomOf="@id/viewFinder"
         app:layout_constraintEnd_toEndOf="parent"
@@ -103,27 +24,25 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/flash"
+            android:id="@+id/flashBtn"
             android:layout_width="43dp"
             android:layout_height="53dp"
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
-            app:layout_constraintEnd_toStartOf="@+id/timer"
+            app:layout_constraintEnd_toStartOf="@+id/timerBtn"
             app:layout_constraintHorizontal_bias="0.375"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/flashoff"
-            android:onClick="buttonPressed"
             />
 
         <ImageButton
-            android:id="@+id/settings"
+            android:id="@+id/settingsBtn"
             android:layout_width="43dp"
             android:layout_height="53dp"
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
-
             android:scaleType="fitCenter"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.956"
@@ -132,14 +51,13 @@
             app:srcCompat="@drawable/settings" />
 
         <ImageButton
-            android:id="@+id/timer"
+            android:id="@+id/timerBtn"
             android:layout_width="43dp"
             android:layout_height="53dp"
             android:adjustViewBounds="true"
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
-
-            app:layout_constraintEnd_toStartOf="@+id/settings"
+            app:layout_constraintEnd_toStartOf="@+id/settingsBtn"
             app:layout_constraintHorizontal_bias="0.19"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -147,5 +65,62 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.camera.view.PreviewView
+        android:id="@+id/viewFinder"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/cameraBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appbar">
+
+    </androidx.camera.view.PreviewView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cameraBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/viewFinder"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageButton
+            android:id="@+id/left_cameraBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_image_24"
+            android:scaleType="fitCenter"
+            android:background="@drawable/rounded_edges_button"
+            android:contentDescription="@string/left_camera_button"
+            app:layout_constraintEnd_toStartOf="@id/captureBtn"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <ImageButton
+            android:id="@+id/captureBtn"
+            android:layout_width="78dp"
+            android:layout_height="78dp"
+            android:layout_marginBottom="17dp"
+            android:layout_marginTop="17dp"
+            android:background="@drawable/round_button"
+            android:focusable="true"
+            android:src="@drawable/ic_baseline_fiber_manual_record_66"
+            android:contentDescription="@string/capture_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/round_button"
+            app:layout_constraintStart_toEndOf="@id/captureBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:contentDescription="@string/stream_button" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

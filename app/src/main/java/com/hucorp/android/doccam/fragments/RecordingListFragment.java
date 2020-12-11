@@ -23,6 +23,7 @@ import org.w3c.dom.Text;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 public class RecordingListFragment extends Fragment
 {
@@ -40,6 +41,7 @@ public class RecordingListFragment extends Fragment
         super.onCreate(savedInstanceState);
         CameraLab cameraLab = CameraLab.get(getActivity());
         mRecordings = cameraLab.getRecordings();
+        Objects.requireNonNull(getActivity()).setTitle("Recordings");
     }
 
     @Nullable
