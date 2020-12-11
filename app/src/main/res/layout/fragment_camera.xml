@@ -1,151 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!-- Todo: Add hex colors to style -->
+<!-- Todo: Change colors to use styles-->
+<!-- Todo: Change some of the id names -->
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/black"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.CameraActivity">
+
+    <!-- Temporary Layout -->
+    <LinearLayout
+        android:id="@+id/appbar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </LinearLayout>
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+        app:layout_constraintBottom_toTopOf="@id/bottombar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
+        app:layout_constraintTop_toBottomOf="@+id/appbar_layout">
 
     </androidx.camera.view.PreviewView>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottomBar"
+    <RelativeLayout
+        android:id="@+id/bottombar"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/viewFinder"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout2"
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/recordBtn"
             android:layout_width="78dp"
             android:layout_height="78dp"
-            android:background="@drawable/btn_background"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5">
+            android:backgroundTint="@color/white"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_baseline_fiber_manual_record_66"
+            android:contentDescription="@string/capture_button" />
 
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/recordBtn"
-                android:layout_width="66dp"
-                android:layout_height="66dp"
-                app:backgroundTint="#FF0000"
-                app:flow_horizontalAlign="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.5" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.cardview.widget.CardView
+        <ImageButton
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:src="@drawable/ic_baseline_image_24"
+            android:scaleType="centerInside"
+            android:background="@drawable/roundcorner"
+            android:layout_toStartOf="@id/recordBtn"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="50dp"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_baseline_image_24"
             android:backgroundTint="@color/white"
-            app:cardCornerRadius="15dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/constraintLayout2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_toEndOf="@id/recordBtn"
+            android:layout_marginStart="50dp"
+            android:layout_centerVertical="true" />
 
-            <ImageButton
-                android:id="@+id/fileView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/gallery_icon" />
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="54dp"
-            android:layout_height="54dp"
-            app:cardCornerRadius="28dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/constraintLayout2"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageButton
-                android:id="@+id/streamBtn"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white" />
-
-        </androidx.cardview.widget.CardView>
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
-        android:layout_width="0dp"
-        android:layout_height="54dp"
-        android:layout_marginBottom="679dp"
-        android:background="@android:color/black"
-        app:layout_constraintTop_toBottomOf="@id/viewFinder"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageButton
-            android:id="@+id/flash"
-            android:layout_width="43dp"
-            android:layout_height="53dp"
-            android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            app:layout_constraintEnd_toStartOf="@+id/timer"
-            app:layout_constraintHorizontal_bias="0.375"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/flashoff"
-            android:onClick="buttonPressed"
-            />
-
-        <ImageButton
-            android:id="@+id/settings"
-            android:layout_width="43dp"
-            android:layout_height="53dp"
-            android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-
-            android:scaleType="fitCenter"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.956"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/settings" />
-
-        <ImageButton
-            android:id="@+id/timer"
-            android:layout_width="43dp"
-            android:layout_height="53dp"
-            android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-
-            app:layout_constraintEnd_toStartOf="@+id/settings"
-            app:layout_constraintHorizontal_bias="0.19"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/timer" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

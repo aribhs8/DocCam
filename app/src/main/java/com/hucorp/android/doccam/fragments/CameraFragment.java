@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.Preview;
+import androidx.camera.core.VideoCapture;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
@@ -32,17 +33,15 @@ import com.hucorp.android.doccam.Recording;
 import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-// Todo: Camera bug - After allowing permission the camera does not open. You need to restart for the camera to appear.
-// Todo: Camera needs to link with storage system (yet to be made).
-
 public class CameraFragment extends Fragment
 {
-    // constants
+    // Constants
     private static final String TAG = "CameraXBasic";
     private static final int REQUEST_CODE_PERMISSIONS = 10;
     private static final List<String> REQUIRED_PERMISSIONS = Arrays.asList(Manifest.permission.CAMERA);
@@ -59,6 +58,7 @@ public class CameraFragment extends Fragment
     private ImageButton mSettingsBtn;
     private ImageButton mflash;
 
+    private boolean mStartRecording;
 
     public static CameraFragment newInstance()
     {
@@ -76,10 +76,12 @@ public class CameraFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
+        mStartRecording = false;
+        VideoCapture videoCapture;
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
 
         mViewFinder = (PreviewView) v.findViewById(R.id.viewFinder);
-        mRecordBtn = v.findViewById(R.id.recordBtn);
+        /*mRecordBtn = v.findViewById(R.id.recordBtn);
         mStreamBtn = v.findViewById(R.id.streamBtn);
         mFileBtn = v.findViewById(R.id.fileView);
         mSettingsBtn = v.findViewById(R.id.settings);
@@ -96,12 +98,21 @@ public class CameraFragment extends Fragment
         mRecordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Recording recording = new Recording();
-                CameraLab lab = CameraLab.get(getActivity());
-                recording.setTitle("Recording " + ((int) lab.getNumberOfRecordings()+1));
-                recording.setDate(new Date());
-                lab.addRecording(recording);
-                Toast.makeText(mContext, recording.getTitle() + " created", Toast.LENGTH_SHORT).show();;
+                if (mStartRecording)
+                {
+                    mStartRecording = false;
+                    Recording recording = new Recording();
+                    CameraLab lab = CameraLab.get(getActivity());
+                    recording.setTitle("Recording " + ((int) lab.getNumberOfRecordings()+1));
+                    recording.setDate(new Date());
+                    lab.addRecording(recording);
+                    Toast.makeText(mContext, recording.getTitle() + " created", Toast.LENGTH_SHORT).show();;
+                }
+                else
+                {
+                    mStartRecording = true;
+                    Toast.makeText(mContext, "Recording started", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -137,7 +148,7 @@ public class CameraFragment extends Fragment
                 startActivity(i);
             }
         });
-
+*/
         return v;
     }
 
@@ -186,13 +197,10 @@ public class CameraFragment extends Fragment
         preview.setSurfaceProvider(mViewFinder.getSurfaceProvider());
 
         Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner)getActivity(), cameraSelector, preview);
-
     }
 
     private boolean allPermissionsGranted()
     {
         return ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
-
-
 }
