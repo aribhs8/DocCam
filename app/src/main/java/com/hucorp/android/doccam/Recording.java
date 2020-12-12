@@ -54,12 +54,6 @@ public class Recording
         mDate = date;
     }
 
-    /*public String getPhotoFileName()
-    {
-        return "IMG_"+getID().toString() + ".jpg";
-    }
-
-     */
     public String getRecordingFileName()
     {
         return "VID_" + getID().toString() + ".mp4";
