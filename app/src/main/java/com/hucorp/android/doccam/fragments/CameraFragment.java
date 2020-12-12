@@ -21,6 +21,8 @@ import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
+import androidx.camera.core.VideoCapture;
+import androidx.camera.core.impl.VideoCaptureConfig;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
@@ -66,9 +68,11 @@ public class CameraFragment extends Fragment
 
     // Camera control
     private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
-    private ImageCapture mImageCapture;
+    //private ImageCapture mImageCapture;
+    private VideoCapture mVideoCapture;
     private ExecutorService mCameraExecutor;
-    private File mPhotoFile;
+    //private File mPhotoFile;
+    private File mRecordingFile;
     private boolean mIsRecording;
     public boolean mFlash;
 
@@ -126,6 +130,7 @@ public class CameraFragment extends Fragment
 
         mCaptureBtn.setOnClickListener(new View.OnClickListener()
         {
+            @SuppressLint("RestrictedApi")
             @Override
             public void onClick(View v)
             {
@@ -137,7 +142,8 @@ public class CameraFragment extends Fragment
                     CameraLab lab = CameraLab.get(getActivity());
                     Recording recording = new Recording(lab.getNumberOfRecordings()+1);
                     lab.addRecording(recording);
-                    takePhoto(recording);
+                    //takePhoto(recording);
+                    record(recording);
 
                     mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
                 }
@@ -146,6 +152,7 @@ public class CameraFragment extends Fragment
                     mIsRecording = true;
                     mLeftBtn.setEnabled(false);
                     mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
+                    mVideoCapture.stopRecording();
                 }
             }
         });
@@ -222,25 +229,26 @@ public class CameraFragment extends Fragment
         }
     }
 
-    private void takePhoto(Recording recording)
+    @SuppressLint("RestrictedApi")
+    private void record(Recording recording)
     {
-        mPhotoFile = CameraLab.get(getActivity()).getPhotoFile(recording);
-        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(mPhotoFile).build();
+        mRecordingFile = CameraLab.get(getActivity()).getRecordingFile(recording);
+        VideoCapture.OutputFileOptions outputFileOptions = new VideoCapture.OutputFileOptions.Builder(mRecordingFile).build();
 
-        mImageCapture.takePicture(outputFileOptions, ContextCompat.getMainExecutor(Objects.requireNonNull(getContext())), new ImageCapture.OnImageSavedCallback()
+        mVideoCapture.startRecording(outputFileOptions, ContextCompat.getMainExecutor(getContext()), new VideoCapture.OnVideoSavedCallback()
         {
             @Override
-            public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults)
+            public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults)
             {
                 Uri uri = FileProvider.getUriForFile(getActivity(),
                         "com.hucorp.android.doccam.fileprovider",
-                        mPhotoFile);
+                        mRecordingFile);
                 String message = "Photo capture succeeded: " + uri.toString();
                 Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onError(@NonNull ImageCaptureException exception)
+            public void onError(int videoCaptureError, @NonNull String message, @Nullable Throwable cause)
             {
 
             }
@@ -267,7 +275,7 @@ public class CameraFragment extends Fragment
         Preview preview = new Preview.Builder()
                 .build();
 
-        mImageCapture = new ImageCapture.Builder()
+        mVideoCapture = new VideoCapture.Builder()
                 .build();
 
         CameraSelector cameraSelector = new CameraSelector.Builder()
@@ -276,7 +284,7 @@ public class CameraFragment extends Fragment
 
         preview.setSurfaceProvider(mViewFinder.getSurfaceProvider());
 
-        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) Objects.requireNonNull(getActivity()), cameraSelector, preview, mImageCapture);
+        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) Objects.requireNonNull(getActivity()), cameraSelector, preview, mVideoCapture);
     }
 
     private boolean allPermissionsGranted()

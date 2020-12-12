@@ -64,7 +64,7 @@ public class RecordingListFragment extends Fragment
         private ListItemRecordingBinding mBinding;
         private TextView mTitleTextView;
         private TextView mDateTextView;
-        private File mPhotoFile;
+        private File mRecordingFile;
 
         private RecordingHolder(ListItemRecordingBinding binding)
         {
@@ -77,7 +77,7 @@ public class RecordingListFragment extends Fragment
 
         public void bind(Recording recording)
         {
-            mPhotoFile = CameraLab.get(getActivity()).getPhotoFile((recording));
+            mRecordingFile = CameraLab.get(getActivity()).getRecordingFile((recording));
             mTitleTextView.setText(recording.getTitle());
             mDateTextView.setText(recording.getDate().toString());
         }

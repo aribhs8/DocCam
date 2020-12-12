@@ -127,9 +127,18 @@ public class CameraLab
         return values;
     }
 
+    /*
     public File getPhotoFile(Recording recording)
     {
         File filesDir = mContext.getFilesDir();
         return new File(filesDir, recording.getPhotoFileName());
+    }
+
+     */
+
+    public File getRecordingFile(Recording recording)
+    {
+        File filesDir = mContext.getFilesDir();
+        return new File(filesDir, recording.getRecordingFileName());
     }
 }
