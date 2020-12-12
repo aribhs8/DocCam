@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -14,12 +15,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.camera.camera2.internal.annotation.CameraExecutor;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
+import androidx.camera.core.ImageCapture;
+import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
@@ -31,12 +36,24 @@ import com.hucorp.android.doccam.Recording;
 import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
 
+import java.io.File;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 
 // Todo: Check copied over camera code with that of documentation; Can I simplify any camera code?
 // Todo: Incorporate video recording code before simplifying camera code
 // Todo: I can't move permissions code to another file but can I move the camera methods to an interface or something?
+
+/*
+* COMMIT PHOTO CHANGES FIRST BEFORE STARTING IN CASE YOU WANT TO ROLLBACK
+* We need to do the following to convert the images into a video
+*   In the Recording.java model we need to change the getPhotoFileName() to be getRecordingFileName(). The value returned also needs to reflect that of a video instead of a photo
+*   In the CameraLab.java class, the getPhotoFile() should also be renamed
+*   Change the ImageCapture field to be VideoCapture
+*   Change the lifecycle bind to use this VideoCapture
+*   Incorporate starting and stopping recording code
+* */
 
 public class CameraFragment extends Fragment
 {
@@ -49,6 +66,9 @@ public class CameraFragment extends Fragment
 
     // Camera control
     private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
+    private ImageCapture mImageCapture;
+    private ExecutorService mCameraExecutor;
+    private File mPhotoFile;
     private boolean mIsRecording;
     public boolean mFlash;
 
@@ -60,6 +80,8 @@ public class CameraFragment extends Fragment
         super.onCreate(savedInstanceState);
         mIsRecording = false;
     }
+
+    // Todo: use mCameraExecutor to destroy
 
     @Nullable
     @Override
@@ -115,16 +137,15 @@ public class CameraFragment extends Fragment
                     CameraLab lab = CameraLab.get(getActivity());
                     Recording recording = new Recording(lab.getNumberOfRecordings()+1);
                     lab.addRecording(recording);
+                    takePhoto(recording);
 
                     mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
-                    Toast.makeText(getContext(), recording.getTitle() + " created", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
                     mIsRecording = true;
                     mLeftBtn.setEnabled(false);
                     mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
-                    Toast.makeText(getContext(), "Capture button has been placed in record mode", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -201,6 +222,31 @@ public class CameraFragment extends Fragment
         }
     }
 
+    private void takePhoto(Recording recording)
+    {
+        mPhotoFile = CameraLab.get(getActivity()).getPhotoFile(recording);
+        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(mPhotoFile).build();
+
+        mImageCapture.takePicture(outputFileOptions, ContextCompat.getMainExecutor(Objects.requireNonNull(getContext())), new ImageCapture.OnImageSavedCallback()
+        {
+            @Override
+            public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults)
+            {
+                Uri uri = FileProvider.getUriForFile(getActivity(),
+                        "com.hucorp.android.doccam.fileprovider",
+                        mPhotoFile);
+                String message = "Photo capture succeeded: " + uri.toString();
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(@NonNull ImageCaptureException exception)
+            {
+
+            }
+        });
+    }
+
     private void startCamera()
     {
         mCameraProviderFuture = ProcessCameraProvider.getInstance(Objects.requireNonNull(getContext()));
@@ -221,13 +267,16 @@ public class CameraFragment extends Fragment
         Preview preview = new Preview.Builder()
                 .build();
 
+        mImageCapture = new ImageCapture.Builder()
+                .build();
+
         CameraSelector cameraSelector = new CameraSelector.Builder()
                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                 .build();
 
         preview.setSurfaceProvider(mViewFinder.getSurfaceProvider());
 
-        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) Objects.requireNonNull(getActivity()), cameraSelector, preview);
+        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) Objects.requireNonNull(getActivity()), cameraSelector, preview, mImageCapture);
     }
 
     private boolean allPermissionsGranted()
