@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,12 +20,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.camera.camera2.internal.annotation.CameraExecutor;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.Preview;
+import androidx.camera.core.VideoCapture;
+import androidx.camera.core.impl.VideoCaptureConfig;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
@@ -36,8 +41,10 @@ import com.hucorp.android.doccam.Recording;
 import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
 
+import java.io.File;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 
 // Todo: Check copied over camera code with that of documentation; Can I simplify any camera code?
 // Todo: Incorporate video recording code before simplifying camera code
@@ -59,6 +66,11 @@ public class CameraFragment extends Fragment
 
     // Camera control
     private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
+    //private ImageCapture mImageCapture;
+    private VideoCapture mVideoCapture;
+    private ExecutorService mCameraExecutor;
+    //private File mPhotoFile;
+    private File mRecordingFile;
     private boolean mIsRecording;
     public boolean mFlash;
     public boolean mTimer;
@@ -71,6 +83,8 @@ public class CameraFragment extends Fragment
         super.onCreate(savedInstanceState);
         mIsRecording = false;
     }
+
+    // Todo: use mCameraExecutor to destroy
 
     @Nullable
     @Override
@@ -124,6 +138,7 @@ public class CameraFragment extends Fragment
 
         mCaptureBtn.setOnClickListener(new View.OnClickListener()
         {
+            @SuppressLint("RestrictedApi")
             @Override
             public void onClick(View v)
             {
@@ -135,16 +150,17 @@ public class CameraFragment extends Fragment
                     CameraLab lab = CameraLab.get(getActivity());
                     Recording recording = new Recording(lab.getNumberOfRecordings()+1);
                     lab.addRecording(recording);
+                    //takePhoto(recording);
+                    record(recording);
 
                     mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
-                    Toast.makeText(getContext(), recording.getTitle() + " created", Toast.LENGTH_SHORT).show();
                 }
                 else
                 {
                     mIsRecording = true;
                     mLeftBtn.setEnabled(false);
                     mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
-                    Toast.makeText(getContext(), "Capture button has been placed in record mode", Toast.LENGTH_SHORT).show();
+                    mVideoCapture.stopRecording();
                 }
             }
         });
@@ -156,7 +172,6 @@ public class CameraFragment extends Fragment
             {
                 Intent intent = new Intent(getActivity(), RecordingListActivity.class);
                 startActivity(intent);
-
             }
         });
     }
@@ -256,6 +271,32 @@ public class CameraFragment extends Fragment
         }
     }
 
+    @SuppressLint("RestrictedApi")
+    private void record(Recording recording)
+    {
+        mRecordingFile = CameraLab.get(getActivity()).getRecordingFile(recording);
+        VideoCapture.OutputFileOptions outputFileOptions = new VideoCapture.OutputFileOptions.Builder(mRecordingFile).build();
+
+        mVideoCapture.startRecording(outputFileOptions, ContextCompat.getMainExecutor(getContext()), new VideoCapture.OnVideoSavedCallback()
+        {
+            @Override
+            public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults)
+            {
+                Uri uri = FileProvider.getUriForFile(getActivity(),
+                        "com.hucorp.android.doccam.fileprovider",
+                        mRecordingFile);
+                String message = "Photo capture succeeded: " + uri.toString();
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(int videoCaptureError, @NonNull String message, @Nullable Throwable cause)
+            {
+
+            }
+        });
+    }
+
     private void startCamera()
     {
         mCameraProviderFuture = ProcessCameraProvider.getInstance(Objects.requireNonNull(getContext()));
@@ -276,13 +317,16 @@ public class CameraFragment extends Fragment
         Preview preview = new Preview.Builder()
                 .build();
 
+        mVideoCapture = new VideoCapture.Builder()
+                .build();
+
         CameraSelector cameraSelector = new CameraSelector.Builder()
                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                 .build();
 
         preview.setSurfaceProvider(mViewFinder.getSurfaceProvider());
 
-        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) Objects.requireNonNull(getActivity()), cameraSelector, preview);
+        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) Objects.requireNonNull(getActivity()), cameraSelector, preview, mVideoCapture);
     }
 
     private boolean allPermissionsGranted()
