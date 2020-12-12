@@ -1,5 +1,6 @@
 package com.hucorp.android.doccam.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +17,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hucorp.android.doccam.CameraLab;
 import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.Recording;
+import com.hucorp.android.doccam.activities.PrivacyPolicyActivity;
 import com.hucorp.android.doccam.databinding.FragmentRecordingListBinding;
 import com.hucorp.android.doccam.databinding.ListItemRecordingBinding;
 
 import org.w3c.dom.Text;
 
 import java.util.List;
+import java.util.Objects;
 
 public class RecordingListFragment extends Fragment
 {
@@ -36,22 +39,31 @@ public class RecordingListFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
+
         super.onCreate(savedInstanceState);
         CameraLab cameraLab = CameraLab.get(getActivity());
         mRecordings = cameraLab.getRecordings();
+        Objects.requireNonNull(getActivity()).setTitle("Recordings");
     }
 
     @Nullable
     @Override
+
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
+        if(mRecordings.size()!=0){
         FragmentRecordingListBinding binding = DataBindingUtil
                 .inflate(inflater, R.layout.fragment_recording_list, container, false);
 
         binding.recordingsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.recordingsRecyclerView.setAdapter(new RecordingAdapter(mRecordings));
 
-        return binding.getRoot();
+        return binding.getRoot();}
+
+        else{
+            View v = inflater.inflate(R.layout.fragment_no_recordings, container, false);
+            return v;
+        }
     }
 
     private class RecordingHolder extends RecyclerView.ViewHolder
@@ -76,7 +88,7 @@ public class RecordingListFragment extends Fragment
         }
     }
 
-    private class RecordingAdapter extends RecyclerView.Adapter<RecordingHolder>
+    public class RecordingAdapter extends RecyclerView.Adapter<RecordingHolder>
     {
         private List<Recording> mRecordings;
 
@@ -109,4 +121,6 @@ public class RecordingListFragment extends Fragment
             return mRecordings.size();
         }
     }
+
+
 }

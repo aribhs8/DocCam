@@ -1,7 +1,10 @@
 package com.hucorp.android.doccam;
 
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
+
+// Todo: Use accompanying ViewModel with recording?
 
 public class Recording
 {
@@ -9,9 +12,10 @@ public class Recording
     private String mTitle;
     private Date mDate;
 
-    public Recording()
+    public Recording(int recording_num)
     {
         this(UUID.randomUUID());
+        mTitle = String.format(Locale.CANADA, "Recording %d", recording_num);
     }
 
     public Recording(UUID ID)
