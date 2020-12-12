@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment;
 
 import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.activities.PrivacyPolicyActivity;
+import com.hucorp.android.doccam.activities.SettingsActivity;
 import com.hucorp.android.doccam.activities.TermsConditionsActivity;
 
 public class SettingsFragment extends Fragment {
@@ -36,6 +37,7 @@ public class SettingsFragment extends Fragment {
     private CardView gdrive, dropbx, onedrive, youtube, twitch;
     private CardView gdrive_expand, dropbox_expand, onedrive_expand, youtube_expand, twitch_expand;
     private ImageView drive_arrow, dropbox_arrow, onedrive_arrow, youtube_arrow, twitch_arrow;
+    private Button privacy_policy, terms_conditions;
 
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
@@ -69,8 +71,28 @@ public class SettingsFragment extends Fragment {
         onedrive_arrow = v.findViewById(R.id.onedrive_arrow);
         youtube_arrow = v.findViewById(R.id.youtube_arrow);
         twitch_arrow = v.findViewById(R.id.twitch_arrow);
+        privacy_policy = v.findViewById(R.id.privacy_policy);
+        terms_conditions = v.findViewById(R.id.term_conditions);
+
+        ButtonsOnClickListener();
+
+        return v;
+    }
+
+    private void toggle(CardView card, CardView expandable, ImageView button){
+        if(expandable.getVisibility() == View.GONE){
+            TransitionManager.beginDelayedTransition(gdrive, new AutoTransition());
+            expandable.setVisibility(View.VISIBLE);
+            button.setImageResource(R.drawable.ic_baseline_keyboard_arrow_up_24);
+        } else {
+            TransitionManager.beginDelayedTransition(gdrive, new AutoTransition());
+            expandable.setVisibility(View.GONE);
+            button.setImageResource(R.drawable.ic_baseline_keyboard_arrow_down_24);
+        }
+    }
 
 
+    private void ButtonsOnClickListener(){
         gdrive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,20 +128,21 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        privacy_policy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getActivity(), PrivacyPolicyActivity.class);
+                startActivity(i);
+            }
+        });
 
+        terms_conditions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getActivity(), TermsConditionsActivity.class);
+                startActivity(i);
+            }
+        });
 
-        return v;
-    }
-
-    private void toggle(CardView card, CardView expandable, ImageView button){
-        if(expandable.getVisibility() == View.GONE){
-            TransitionManager.beginDelayedTransition(gdrive, new AutoTransition());
-            expandable.setVisibility(View.VISIBLE);
-            button.setImageResource(R.drawable.ic_baseline_keyboard_arrow_up_24);
-        } else {
-            TransitionManager.beginDelayedTransition(gdrive, new AutoTransition());
-            expandable.setVisibility(View.GONE);
-            button.setImageResource(R.drawable.ic_baseline_keyboard_arrow_down_24);
-        }
     }
 }
