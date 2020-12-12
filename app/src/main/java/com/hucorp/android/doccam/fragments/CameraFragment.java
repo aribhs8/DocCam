@@ -4,11 +4,16 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -47,10 +52,16 @@ public class CameraFragment extends Fragment
     private ImageButton mSettingsBtn;
     private ImageButton mFlashBtn;
 
+    //Timer
+    private ImageButton mTimerBtn;
+    private Button mfiveTimerBtn;
+    private Button mtenTimerBtn;
+
     // Camera control
     private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
     private boolean mIsRecording;
     public boolean mFlash;
+    public boolean mTimer;
 
     public static CameraFragment newInstance() { return new CameraFragment(); }
 
@@ -73,6 +84,15 @@ public class CameraFragment extends Fragment
         mLeftBtn = (ImageButton) v.findViewById(R.id.left_cameraBtn);
         mSettingsBtn = (ImageButton) v.findViewById(R.id.settingsBtn);
         mFlashBtn = (ImageButton) v.findViewById(R.id.flashBtn);
+
+        //Timer
+        mTimerBtn = (ImageButton) v.findViewById(R.id.timerBtn);
+        mfiveTimerBtn = (Button) v.findViewById(R.id.fivetimer);
+        mtenTimerBtn = (Button) v.findViewById(R.id.tentimer);
+        mTimer = true;
+        mFlash = true;
+        mfiveTimerBtn.setVisibility(v.GONE);
+        mtenTimerBtn.setVisibility(v.GONE);
 
         initCamera();               // Check for permissions and start camera
         controlCameraBarInput();    // Poll for user input on camera bar
@@ -136,6 +156,7 @@ public class CameraFragment extends Fragment
             {
                 Intent intent = new Intent(getActivity(), RecordingListActivity.class);
                 startActivity(intent);
+
             }
         });
     }
@@ -169,6 +190,40 @@ public class CameraFragment extends Fragment
                 }
             }
         });
+
+
+        mTimerBtn.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v){
+
+                if (mTimer)
+                {
+                    mTimer = false;
+                    Animation animation1 = AnimationUtils.loadAnimation(getContext(), R.anim.fadein);
+                    mtenTimerBtn.setVisibility(v.VISIBLE);
+                    mtenTimerBtn.startAnimation(animation1);
+                    mfiveTimerBtn.setVisibility(v.VISIBLE);
+                    mfiveTimerBtn.startAnimation(animation1);
+                }
+                else
+                {
+                    mTimer = true;
+                    Animation animation2 = AnimationUtils.loadAnimation(getContext(), R.anim.fadeout);
+
+                    mtenTimerBtn.startAnimation(animation2);
+                    mfiveTimerBtn.startAnimation(animation2);
+                    mfiveTimerBtn.setVisibility(v.GONE);
+                    mtenTimerBtn.setVisibility(v.GONE);
+                }
+
+                // AnimationUtils.loadAnimation(this,)
+
+            }
+        });
+
+
+
 
     }
 
