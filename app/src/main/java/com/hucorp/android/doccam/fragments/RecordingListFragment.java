@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,6 +24,7 @@ import com.hucorp.android.doccam.databinding.ListItemRecordingBinding;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,6 +73,7 @@ public class RecordingListFragment extends Fragment
         private ListItemRecordingBinding mBinding;
         private TextView mTitleTextView;
         private TextView mDateTextView;
+        private File mRecordingFile;
 
         private RecordingHolder(ListItemRecordingBinding binding)
         {
@@ -83,6 +86,7 @@ public class RecordingListFragment extends Fragment
 
         public void bind(Recording recording)
         {
+            mRecordingFile = CameraLab.get(getActivity()).getRecordingFile((recording));
             mTitleTextView.setText(recording.getTitle());
             mDateTextView.setText(recording.getDate().toString());
         }
