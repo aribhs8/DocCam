@@ -5,11 +5,16 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -18,8 +23,6 @@ import androidx.annotation.Nullable;
 import androidx.camera.camera2.internal.annotation.CameraExecutor;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
-import androidx.camera.core.ImageCapture;
-import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.core.VideoCapture;
 import androidx.camera.core.impl.VideoCaptureConfig;
@@ -47,16 +50,6 @@ import java.util.concurrent.ExecutorService;
 // Todo: Incorporate video recording code before simplifying camera code
 // Todo: I can't move permissions code to another file but can I move the camera methods to an interface or something?
 
-/*
-* COMMIT PHOTO CHANGES FIRST BEFORE STARTING IN CASE YOU WANT TO ROLLBACK
-* We need to do the following to convert the images into a video
-*   In the Recording.java model we need to change the getPhotoFileName() to be getRecordingFileName(). The value returned also needs to reflect that of a video instead of a photo
-*   In the CameraLab.java class, the getPhotoFile() should also be renamed
-*   Change the ImageCapture field to be VideoCapture
-*   Change the lifecycle bind to use this VideoCapture
-*   Incorporate starting and stopping recording code
-* */
-
 public class CameraFragment extends Fragment
 {
     // Layout elements
@@ -65,6 +58,11 @@ public class CameraFragment extends Fragment
     private ImageButton mLeftBtn;
     private ImageButton mSettingsBtn;
     private ImageButton mFlashBtn;
+
+    //Timer
+    private ImageButton mTimerBtn;
+    private Button mfiveTimerBtn;
+    private Button mtenTimerBtn;
 
     // Camera control
     private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
@@ -75,6 +73,7 @@ public class CameraFragment extends Fragment
     private File mRecordingFile;
     private boolean mIsRecording;
     public boolean mFlash;
+    public boolean mTimer;
 
     public static CameraFragment newInstance() { return new CameraFragment(); }
 
@@ -99,6 +98,15 @@ public class CameraFragment extends Fragment
         mLeftBtn = (ImageButton) v.findViewById(R.id.left_cameraBtn);
         mSettingsBtn = (ImageButton) v.findViewById(R.id.settingsBtn);
         mFlashBtn = (ImageButton) v.findViewById(R.id.flashBtn);
+
+        //Timer
+        mTimerBtn = (ImageButton) v.findViewById(R.id.timerBtn);
+        mfiveTimerBtn = (Button) v.findViewById(R.id.fivetimer);
+        mtenTimerBtn = (Button) v.findViewById(R.id.tentimer);
+        mTimer = true;
+        mFlash = true;
+        mfiveTimerBtn.setVisibility(v.GONE);
+        mtenTimerBtn.setVisibility(v.GONE);
 
         initCamera();               // Check for permissions and start camera
         controlCameraBarInput();    // Poll for user input on camera bar
@@ -197,6 +205,40 @@ public class CameraFragment extends Fragment
                 }
             }
         });
+
+
+        mTimerBtn.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v){
+
+                if (mTimer)
+                {
+                    mTimer = false;
+                    Animation animation1 = AnimationUtils.loadAnimation(getContext(), R.anim.fadein);
+                    mtenTimerBtn.setVisibility(v.VISIBLE);
+                    mtenTimerBtn.startAnimation(animation1);
+                    mfiveTimerBtn.setVisibility(v.VISIBLE);
+                    mfiveTimerBtn.startAnimation(animation1);
+                }
+                else
+                {
+                    mTimer = true;
+                    Animation animation2 = AnimationUtils.loadAnimation(getContext(), R.anim.fadeout);
+
+                    mtenTimerBtn.startAnimation(animation2);
+                    mfiveTimerBtn.startAnimation(animation2);
+                    mfiveTimerBtn.setVisibility(v.GONE);
+                    mtenTimerBtn.setVisibility(v.GONE);
+                }
+
+                // AnimationUtils.loadAnimation(this,)
+
+            }
+        });
+
+
+
 
     }
 
