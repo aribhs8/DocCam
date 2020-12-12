@@ -5,9 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,12 +18,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.camera.camera2.internal.annotation.CameraExecutor;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.Preview;
 import androidx.camera.core.VideoCapture;
-import androidx.camera.core.impl.VideoCaptureConfig;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
@@ -45,10 +41,7 @@ import java.io.File;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-
-// Todo: Check copied over camera code with that of documentation; Can I simplify any camera code?
-// Todo: Incorporate video recording code before simplifying camera code
-// Todo: I can't move permissions code to another file but can I move the camera methods to an interface or something?
+import java.util.concurrent.Executors;
 
 public class CameraFragment extends Fragment
 {
@@ -61,15 +54,13 @@ public class CameraFragment extends Fragment
 
     //Timer
     private ImageButton mTimerBtn;
-    private Button mfiveTimerBtn;
-    private Button mtenTimerBtn;
+    private Button mFiveTimerBtn;
+    private Button mTenTimerBtn;
 
     // Camera control
     private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
-    //private ImageCapture mImageCapture;
     private VideoCapture mVideoCapture;
     private ExecutorService mCameraExecutor;
-    //private File mPhotoFile;
     private File mRecordingFile;
     private boolean mIsRecording;
     public boolean mFlash;
@@ -82,9 +73,15 @@ public class CameraFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
         mIsRecording = false;
+        mCameraExecutor = Executors.newSingleThreadExecutor();
     }
 
-    // Todo: use mCameraExecutor to destroy
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        mCameraExecutor.shutdown();
+    }
 
     @Nullable
     @Override
@@ -99,14 +96,14 @@ public class CameraFragment extends Fragment
         mSettingsBtn = (ImageButton) v.findViewById(R.id.settingsBtn);
         mFlashBtn = (ImageButton) v.findViewById(R.id.flashBtn);
 
-        //Timer
+        // Timer
         mTimerBtn = (ImageButton) v.findViewById(R.id.timerBtn);
-        mfiveTimerBtn = (Button) v.findViewById(R.id.fivetimer);
-        mtenTimerBtn = (Button) v.findViewById(R.id.tentimer);
+        mFiveTimerBtn = (Button) v.findViewById(R.id.fivetimer);
+        mTenTimerBtn = (Button) v.findViewById(R.id.tentimer);
         mTimer = true;
         mFlash = true;
-        mfiveTimerBtn.setVisibility(v.GONE);
-        mtenTimerBtn.setVisibility(v.GONE);
+        mFiveTimerBtn.setVisibility(v.GONE);
+        mTenTimerBtn.setVisibility(v.GONE);
 
         initCamera();               // Check for permissions and start camera
         controlCameraBarInput();    // Poll for user input on camera bar
@@ -154,8 +151,7 @@ public class CameraFragment extends Fragment
                     record(recording);
 
                     mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
-                }
-                else
+                } else
                 {
                     mIsRecording = true;
                     mLeftBtn.setEnabled(false);
@@ -197,8 +193,7 @@ public class CameraFragment extends Fragment
                 {
                     mFlash = false;
                     mFlashBtn.setImageResource(R.drawable.flash);
-                }
-                else
+                } else
                 {
                     mFlash = true;
                     mFlashBtn.setImageResource(R.drawable.flashoff);
@@ -216,20 +211,19 @@ public class CameraFragment extends Fragment
                 {
                     mTimer = false;
                     Animation animation1 = AnimationUtils.loadAnimation(getContext(), R.anim.fadein);
-                    mtenTimerBtn.setVisibility(v.VISIBLE);
-                    mtenTimerBtn.startAnimation(animation1);
-                    mfiveTimerBtn.setVisibility(v.VISIBLE);
-                    mfiveTimerBtn.startAnimation(animation1);
-                }
-                else
+                    mTenTimerBtn.setVisibility(v.VISIBLE);
+                    mTenTimerBtn.startAnimation(animation1);
+                    mFiveTimerBtn.setVisibility(v.VISIBLE);
+                    mFiveTimerBtn.startAnimation(animation1);
+                } else
                 {
                     mTimer = true;
                     Animation animation2 = AnimationUtils.loadAnimation(getContext(), R.anim.fadeout);
 
-                    mtenTimerBtn.startAnimation(animation2);
-                    mfiveTimerBtn.startAnimation(animation2);
-                    mfiveTimerBtn.setVisibility(v.GONE);
-                    mtenTimerBtn.setVisibility(v.GONE);
+                    mTenTimerBtn.startAnimation(animation2);
+                    mFiveTimerBtn.startAnimation(animation2);
+                    mFiveTimerBtn.setVisibility(v.GONE);
+                    mTenTimerBtn.setVisibility(v.GONE);
                 }
 
                 // AnimationUtils.loadAnimation(this,)
@@ -250,9 +244,8 @@ public class CameraFragment extends Fragment
         {
             if (allPermissionsGranted())
             {
-                startCamera();;
-            }
-            else
+                startCamera();
+            } else
             {
                 Toast.makeText(getContext(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
                 // Todo: Open a dialog here that tells the user they cannot use app without permission (remove Toast)

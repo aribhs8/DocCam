@@ -40,9 +40,7 @@ public class CameraLab
         //return mRecordings;
         List<Recording> recordings = new ArrayList<>();
 
-        RecordingCursorWrapper cursor = queryRecordings(null, null);
-
-        try
+        try (RecordingCursorWrapper cursor = queryRecordings(null, null))
         {
             cursor.moveToFirst();
             while (!cursor.isAfterLast())
@@ -51,22 +49,17 @@ public class CameraLab
                 cursor.moveToNext();
             }
         }
-        finally
-        {
-            cursor.close();
-        }
 
         return recordings;
     }
 
     public Recording getRecording(UUID id)
     {
-        RecordingCursorWrapper cursor = queryRecordings(
-                RecordingTable.Cols.UUID + " = ?",
-                new String[] { id.toString() }
-        );
 
-        try
+        try (RecordingCursorWrapper cursor = queryRecordings(
+                RecordingTable.Cols.UUID + " = ?",
+                new String[]{id.toString()}
+        ))
         {
             if (cursor.getCount() == 0)
             {
@@ -74,10 +67,6 @@ public class CameraLab
             }
             cursor.moveToFirst();
             return cursor.getRecording();
-        }
-        finally
-        {
-            cursor.close();
         }
     }
 
@@ -126,15 +115,6 @@ public class CameraLab
 
         return values;
     }
-
-    /*
-    public File getPhotoFile(Recording recording)
-    {
-        File filesDir = mContext.getFilesDir();
-        return new File(filesDir, recording.getPhotoFileName());
-    }
-
-     */
 
     public File getRecordingFile(Recording recording)
     {
