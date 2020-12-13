@@ -31,7 +31,7 @@
             android:theme="@style/Theme.DocCam"/>
         <activity
             android:name=".activities.CameraActivity"
-            android:theme="@style/Theme.Design.Light.NoActionBar">
+            android:theme="@style/Theme.DocCam.Camera">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
