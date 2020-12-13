@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- Todo: Add hex colors to style -->
-<!-- Todo: Change colors to use styles-->
 <!-- Todo: Create drawable resources for differing screen sizes -->
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -9,7 +7,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black"
     tools:context=".activities.CameraActivity">
 
     <!-- Todo: This layout needs to use less defined numbers & incorporate more drawable resources -->
@@ -17,7 +14,6 @@
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="54dp"
-        android:background="@android:color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/viewFinder"
@@ -63,35 +59,32 @@
             app:srcCompat="@drawable/timer" />
 
         <Button
-            android:id="@+id/tentimer"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="86dp"
-            android:layout_height="48dp"
-            android:text="10 sec"
-            android:textAlignment="center"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/settingsBtn"
-            app:layout_constraintHorizontal_bias="0.567"
-            app:layout_constraintStart_toEndOf="@+id/timerBtn"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
             android:id="@+id/fivetimer"
             style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="86dp"
+            android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:text="5 sec"
+            android:text="@string/five_timer"
             android:textAlignment="center"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tentimer"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toEndOf="@+id/timerBtn"
+            android:layout_marginStart="5dp"
+            app:layout_constraintStart_toEndOf="@id/timerBtn"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             />
+
+        <Button
+            android:id="@+id/tentimer"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="@string/ten_timer"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/fivetimer"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

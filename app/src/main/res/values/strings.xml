@@ -7,4 +7,6 @@
     <string name="capture_button">Capture Button</string>
     <string name="left_camera_button">View/Pause Recordings (depending on mode)</string>
     <string name="stream_button">Stream</string>
+    <string name="five_timer">5 sec</string>
+    <string name="ten_timer">10 sec</string>
 </resources>
