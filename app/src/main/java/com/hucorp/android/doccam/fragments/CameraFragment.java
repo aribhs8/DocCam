@@ -5,7 +5,10 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,6 +17,8 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -56,6 +61,11 @@ public class CameraFragment extends Fragment
     private ImageButton mTimerBtn;
     private Button mFiveTimerBtn;
     private Button mTenTimerBtn;
+    private ProgressBar timerBarBtn;
+
+    private TextView mtimedisplay;
+
+
 
     // Camera control
     private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
@@ -65,6 +75,9 @@ public class CameraFragment extends Fragment
     private boolean mIsRecording;
     public boolean mFlash;
     public boolean mTimer;
+
+    public boolean m5Timer;
+    public boolean m10Timer;
 
     public static CameraFragment newInstance() { return new CameraFragment(); }
 
@@ -96,14 +109,24 @@ public class CameraFragment extends Fragment
         mSettingsBtn = (ImageButton) v.findViewById(R.id.settingsBtn);
         mFlashBtn = (ImageButton) v.findViewById(R.id.flashBtn);
 
+        timerBarBtn = (ProgressBar) v.findViewById(R.id.timerBar);
+        timerBarBtn.setVisibility(v.GONE);
+
         // Timer
         mTimerBtn = (ImageButton) v.findViewById(R.id.timerBtn);
         mFiveTimerBtn = (Button) v.findViewById(R.id.fivetimer);
         mTenTimerBtn = (Button) v.findViewById(R.id.tentimer);
+
         mTimer = true;
         mFlash = true;
+        m5Timer = false;
+        m10Timer = false;
+
         mFiveTimerBtn.setVisibility(v.GONE);
         mTenTimerBtn.setVisibility(v.GONE);
+        mtimedisplay = (TextView) v.findViewById(R.id.timedisplay);
+
+        mtimedisplay.setVisibility(v.GONE);
 
         initCamera();               // Check for permissions and start camera
         controlCameraBarInput();    // Poll for user input on camera bar
@@ -153,10 +176,52 @@ public class CameraFragment extends Fragment
                     mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
                 } else
                 {
-                    mIsRecording = true;
-                    mLeftBtn.setEnabled(false);
-                    mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
-                    mVideoCapture.stopRecording();
+                    if (m5Timer) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            timerBarBtn.setVisibility(v.VISIBLE);
+                            timerBarBtn.setProgress(10,true);
+                        }
+                        Runnable r = new Runnable() {
+                            @Override
+                            public void run(){
+                                timerBarBtn.setVisibility(v.GONE);
+                                mIsRecording = true;
+                                mLeftBtn.setEnabled(false);
+                                mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
+                                mVideoCapture.stopRecording();
+                            }
+                        };
+                        Handler h = new Handler();
+                        h.postDelayed(r, 5000); // <-- the "1000" is the delay time in miliseconds.
+                    }
+
+                    else if (m10Timer) {
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            timerBarBtn.setVisibility(v.VISIBLE);
+                            timerBarBtn.setProgress(10,true);
+                        }
+
+                        Runnable r = new Runnable() {
+                            @Override
+                            public void run(){
+                                timerBarBtn.setVisibility(v.GONE);
+                                mIsRecording = true;
+                                mLeftBtn.setEnabled(false);
+                                mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
+                                mVideoCapture.stopRecording();
+                            }
+                        };
+                        Handler h = new Handler();
+                        h.postDelayed(r, 10000); // <-- the "1000" is the delay time in miliseconds.
+                    }
+
+                    else{
+                        mIsRecording = true;
+                        mLeftBtn.setEnabled(false);
+                        mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
+                        mVideoCapture.stopRecording();
+                    }
                 }
             }
         });
@@ -215,6 +280,7 @@ public class CameraFragment extends Fragment
                     mTenTimerBtn.startAnimation(animation1);
                     mFiveTimerBtn.setVisibility(v.VISIBLE);
                     mFiveTimerBtn.startAnimation(animation1);
+
                 } else
                 {
                     mTimer = true;
@@ -224,16 +290,83 @@ public class CameraFragment extends Fragment
                     mFiveTimerBtn.startAnimation(animation2);
                     mFiveTimerBtn.setVisibility(v.GONE);
                     mTenTimerBtn.setVisibility(v.GONE);
+
                 }
-
-                // AnimationUtils.loadAnimation(this,)
-
             }
         });
 
+        mFiveTimerBtn.setOnClickListener(new View.OnClickListener()
+        {
+
+            @Override
+            public void onClick(View v){
+
+                mFiveTimerBtn.clearAnimation();
+                mTenTimerBtn.clearAnimation();
+
+                Animation animation3 = AnimationUtils.loadAnimation(getContext(), R.anim.fadeout);
+
+                mTenTimerBtn.startAnimation(animation3);
+                mFiveTimerBtn.startAnimation(animation3);
+
+                mFiveTimerBtn.setVisibility(v.GONE);
+                mTenTimerBtn.setVisibility(v.GONE);
+
+                mTimer = true;
+
+                m10Timer = false;
+
+                if (m5Timer)
+                {
+                    m5Timer = false;
+                    mtimedisplay.setText("5s");
+                    mtimedisplay.setVisibility(v.GONE);
+
+                } else
+                {
+                    m5Timer = true;
+                    mtimedisplay.setText("5s");
+                    mtimedisplay.setVisibility(v.VISIBLE);
+
+                }
+            }
+        });
+
+        mTenTimerBtn.setOnClickListener(new View.OnClickListener()
+        {
+
+            @Override
+            public void onClick(View v){
+                mFiveTimerBtn.clearAnimation();
+                mTenTimerBtn.clearAnimation();
+
+                Animation animation3 = AnimationUtils.loadAnimation(getContext(), R.anim.fadeout);
+
+                mTenTimerBtn.startAnimation(animation3);
+                mFiveTimerBtn.startAnimation(animation3);
+
+                mFiveTimerBtn.setVisibility(v.GONE);
+                mTenTimerBtn.setVisibility(v.GONE);
+
+                mTimer = true;
+
+                m5Timer = false;
+
+                if (m10Timer)
+                {
+                    m10Timer = false;
+                    mtimedisplay.setText("10s");
+                    mtimedisplay.setVisibility(v.GONE);
 
 
-
+                } else
+                {
+                    m10Timer = true;
+                    mtimedisplay.setText("10s");
+                    mtimedisplay.setVisibility(v.VISIBLE);
+                }
+            }
+        });
     }
 
     @Override
