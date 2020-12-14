@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hucorp.android.doccam.CameraLab;
 import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.Recording;
+import com.hucorp.android.doccam.RecordingViewModel;
 import com.hucorp.android.doccam.activities.PrivacyPolicyActivity;
 import com.hucorp.android.doccam.databinding.FragmentRecordingListBinding;
 import com.hucorp.android.doccam.databinding.ListItemRecordingBinding;
@@ -79,16 +80,19 @@ public class RecordingListFragment extends Fragment
         {
             super(binding.getRoot());
             mBinding = binding;
+            mBinding.setViewModel(new RecordingViewModel(getContext()));
 
-            mTitleTextView = (TextView) itemView.findViewById(R.id.recording_title);
-            mDateTextView = (TextView) itemView.findViewById(R.id.recording_created_date);
+            //mTitleTextView = (TextView) itemView.findViewById(R.id.recording_title);
+            //mDateTextView = (TextView) itemView.findViewById(R.id.recording_created_date);
         }
 
         public void bind(Recording recording)
         {
-            mRecordingFile = CameraLab.get(getActivity()).getRecordingFile((recording));
-            mTitleTextView.setText(recording.getTitle());
-            mDateTextView.setText(recording.getDate().toString());
+            mBinding.getViewModel().setRecording(recording);
+            mBinding.executePendingBindings();
+//            mRecordingFile = CameraLab.get(getActivity()).getRecordingFile((recording));
+//            mTitleTextView.setText(recording.getTitle());
+//            mDateTextView.setText(recording.getDate().toString());
         }
     }
 

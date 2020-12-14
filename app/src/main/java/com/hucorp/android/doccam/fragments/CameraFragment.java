@@ -278,7 +278,7 @@ public class CameraFragment extends Fragment
                 Uri uri = FileProvider.getUriForFile(getActivity(),
                         "com.hucorp.android.doccam.fileprovider",
                         mRecordingFile);
-                String message = "Photo capture succeeded: " + uri.toString();
+                String message = "Recording created";
                 Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
             }
 
