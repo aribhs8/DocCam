@@ -2,11 +2,22 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="com.hucorp.android.doccam.RecordingViewModel" />
+    </data>
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:onClick="@{(view) -> viewModel.onClick()}"
         app:cardElevation="5dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:focusable="true"
+        android:clickable="true"
         app:cardCornerRadius="10dp">
 
         <RelativeLayout
@@ -25,11 +36,12 @@
                     android:id="@+id/recording_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/recording_title"
+                    android:text="@{viewModel.title}"
                     android:textSize="24sp"
                     android:textColor="@color/black"/>
 
                 <TextView
+                    android:id="@+id/recording_quality"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/recording_quality" />
@@ -38,7 +50,13 @@
                     android:id="@+id/recording_created_date"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/date" />
+                    android:text="@{viewModel.dateFormatted}" />
+
+                <TextView
+                    android:id="@+id/recording_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/duration"/>
 
             </LinearLayout>
 

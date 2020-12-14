@@ -1,15 +1,12 @@
 package com.hucorp.android.doccam.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hucorp.android.doccam.CameraLab;
 import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.Recording;
-import com.hucorp.android.doccam.activities.PrivacyPolicyActivity;
+import com.hucorp.android.doccam.RecordingViewModel;
 import com.hucorp.android.doccam.databinding.FragmentRecordingListBinding;
 import com.hucorp.android.doccam.databinding.ListItemRecordingBinding;
 
@@ -71,24 +68,18 @@ public class RecordingListFragment extends Fragment
     private class RecordingHolder extends RecyclerView.ViewHolder
     {
         private ListItemRecordingBinding mBinding;
-        private TextView mTitleTextView;
-        private TextView mDateTextView;
-        private File mRecordingFile;
 
         private RecordingHolder(ListItemRecordingBinding binding)
         {
             super(binding.getRoot());
             mBinding = binding;
-
-            mTitleTextView = (TextView) itemView.findViewById(R.id.recording_title);
-            mDateTextView = (TextView) itemView.findViewById(R.id.recording_created_date);
+            mBinding.setViewModel(new RecordingViewModel(getContext()));
         }
 
         public void bind(Recording recording)
         {
-            mRecordingFile = CameraLab.get(getActivity()).getRecordingFile((recording));
-            mTitleTextView.setText(recording.getTitle());
-            mDateTextView.setText(recording.getDate().toString());
+            mBinding.getViewModel().setRecording(recording);
+            mBinding.executePendingBindings();
         }
     }
 
