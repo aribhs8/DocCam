@@ -1,16 +1,13 @@
 package com.hucorp.android.doccam;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import static androidx.core.content.ContextCompat.startActivity;
