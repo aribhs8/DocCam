@@ -10,10 +10,11 @@
     tools:context=".activities.CameraActivity">
 
     <!-- Todo: This layout needs to use less defined numbers & incorporate more drawable resources -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="54dp"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/viewFinder"
@@ -30,14 +31,14 @@
                 android:id="@+id/flashBtn"
                 android:layout_width="43dp"
                 android:layout_height="53dp"
+                android:layout_marginStart="8dp"
                 android:adjustViewBounds="true"
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
-                app:layout_constraintEnd_toStartOf="@+id/timerBtn"
-                app:layout_constraintHorizontal_bias="0.375"
+                android:src="@drawable/flashoff"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/flashoff" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/timerBtn"
@@ -46,11 +47,11 @@
                 android:adjustViewBounds="true"
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
+                android:src="@drawable/timer"
                 app:layout_constraintEnd_toStartOf="@+id/settingsBtn"
                 app:layout_constraintHorizontal_bias="0.19"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/timer" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/fivetimer"
@@ -104,11 +105,11 @@
                 android:adjustViewBounds="true"
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
+                android:src="@drawable/settings"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.956"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/settings" />
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -128,6 +129,7 @@
                 android:scaleType="fitCenter"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:srcCompat="@drawable/flashoff" />
 
             <ImageView
@@ -140,13 +142,11 @@
                 app:layout_constraintTop_toTopOf="@id/stopwatch"
                 app:srcCompat="@drawable/ic_baseline_fiber_manual_record_24" />
 
-            <!-- Todo: change style of text colors -->
             <TextView
                 android:id="@+id/stopwatch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/recording_duration"
-                android:textColor="@color/white"
                 android:textSize="24sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -154,7 +154,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
@@ -183,7 +183,7 @@
             android:background="@drawable/rounded_edges_button"
             android:contentDescription="@string/left_camera_button"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_baseline_image_24"
+            app:srcCompat="@drawable/ic_baseline_image_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/captureBtn"
             app:layout_constraintStart_toStartOf="parent"
@@ -198,7 +198,7 @@
             android:background="@drawable/round_button"
             android:contentDescription="@string/capture_button"
             android:focusable="true"
-            android:src="@drawable/ic_baseline_fiber_manual_record_66"
+            app:srcCompat="@drawable/ic_baseline_fiber_manual_record_66"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

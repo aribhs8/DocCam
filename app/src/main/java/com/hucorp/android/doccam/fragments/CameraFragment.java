@@ -29,6 +29,7 @@ import androidx.camera.core.Preview;
 import androidx.camera.core.VideoCapture;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -52,6 +53,8 @@ public class CameraFragment extends Fragment
 {
     // Layout elements
     private PreviewView mViewFinder;
+    private ConstraintLayout mDefaultAppBar;
+    private ConstraintLayout mRecordingAppBar;
     private ImageButton mCaptureBtn;
     private ImageButton mLeftBtn;
     private ImageButton mSettingsBtn;
@@ -62,22 +65,19 @@ public class CameraFragment extends Fragment
     private Button mFiveTimerBtn;
     private Button mTenTimerBtn;
     private ProgressBar timerBarBtn;
-
     private TextView mtimedisplay;
-
-
+    public boolean mTimer;
+    public boolean m5Timer;
+    public boolean m10Timer;
 
     // Camera control
     private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
     private VideoCapture mVideoCapture;
     private ExecutorService mCameraExecutor;
+    private Recording mRecording;
     private File mRecordingFile;
     private boolean mIsRecording;
     public boolean mFlash;
-    public boolean mTimer;
-
-    public boolean m5Timer;
-    public boolean m10Timer;
 
     public static CameraFragment newInstance() { return new CameraFragment(); }
 
@@ -104,6 +104,8 @@ public class CameraFragment extends Fragment
 
         // Initialize layout elements
         mViewFinder = (PreviewView) v.findViewById(R.id.viewFinder);
+        mDefaultAppBar = (ConstraintLayout) v.findViewById(R.id.default_appbar);
+        mRecordingAppBar = (ConstraintLayout) v.findViewById(R.id.recording_appbar);
         mCaptureBtn = (ImageButton) v.findViewById(R.id.captureBtn);
         mLeftBtn = (ImageButton) v.findViewById(R.id.left_cameraBtn);
         mSettingsBtn = (ImageButton) v.findViewById(R.id.settingsBtn);
@@ -162,18 +164,19 @@ public class CameraFragment extends Fragment
             @Override
             public void onClick(View v)
             {
+                mIsRecording = !mIsRecording;       // Toggle recording state
                 if (mIsRecording)
                 {
-                    mIsRecording = false;
-                    mLeftBtn.setEnabled(true);
+                    // Camera has switched to recording state
+                    mRecording = new Recording(CameraLab.get(getActivity()).getNumberOfRecordings()+1);
+                    record();
+                    updateUI();
+                } else
+                {
+                    mVideoCapture.stopRecording();
+                }
 
-                    CameraLab lab = CameraLab.get(getActivity());
-                    Recording recording = new Recording(lab.getNumberOfRecordings()+1);
-                    lab.addRecording(recording);
-                    //takePhoto(recording);
-                    record(recording);
-
-                    mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
+                /*
                 } else
                 {
                     if (m5Timer) {
@@ -223,6 +226,8 @@ public class CameraFragment extends Fragment
                         mVideoCapture.stopRecording();
                     }
                 }
+
+                 */
             }
         });
 
@@ -369,6 +374,27 @@ public class CameraFragment extends Fragment
         });
     }
 
+    private void updateUI()
+    {
+        // Todo: Add animations to make UI change smoother
+        // Toggle buttons based on recording mode
+        mLeftBtn.setEnabled(!mIsRecording);     // Disable file button
+
+        if (mIsRecording)
+        {
+            // Camera is recording video
+            mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
+            mDefaultAppBar.setVisibility(View.GONE);
+            mRecordingAppBar.setVisibility(View.VISIBLE);
+        } else
+        {
+            // Camera is idle
+            mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
+            mRecordingAppBar.setVisibility(View.GONE);
+            mDefaultAppBar.setVisibility(View.VISIBLE);
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
     {
@@ -398,9 +424,9 @@ public class CameraFragment extends Fragment
     }
 
     @SuppressLint("RestrictedApi")
-    private void record(Recording recording)
+    private void record()
     {
-        mRecordingFile = CameraLab.get(getActivity()).getRecordingFile(recording);
+        mRecordingFile = CameraLab.get(getActivity()).getRecordingFile(mRecording);
         VideoCapture.OutputFileOptions outputFileOptions = new VideoCapture.OutputFileOptions.Builder(mRecordingFile).build();
 
         mVideoCapture.startRecording(outputFileOptions, ContextCompat.getMainExecutor(getContext()), new VideoCapture.OnVideoSavedCallback()
@@ -411,8 +437,9 @@ public class CameraFragment extends Fragment
                 Uri uri = FileProvider.getUriForFile(getActivity(),
                         "com.hucorp.android.doccam.fileprovider",
                         mRecordingFile);
-                String message = "Recording created";
-                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                CameraLab.get(getActivity()).addRecording(mRecording);
+                Toast.makeText(getContext(), mRecording.getTitle() + " Created", Toast.LENGTH_SHORT).show();
+                updateUI();
             }
 
             @Override

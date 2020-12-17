@@ -4,8 +4,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
-// Todo: Use accompanying ViewModel with recording?
-
 public class Recording
 {
     private UUID mID;

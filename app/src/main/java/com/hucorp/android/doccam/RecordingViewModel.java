@@ -57,7 +57,8 @@ public class RecordingViewModel extends BaseObservable
     {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider", CameraLab.get(mContext).getRecordingFile(mRecording)), "video/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.setDataAndType(FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider",
+                CameraLab.get(mContext).getRecordingFile(mRecording)), "video/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(mContext, intent, null);
     }
 }
