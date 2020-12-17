@@ -133,9 +133,11 @@
                 app:srcCompat="@drawable/flashoff" />
 
             <ImageView
+                android:id="@+id/recording_indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
+                android:visibility="invisible"
                 android:contentDescription="@string/recording_indicator"
                 app:layout_constraintBottom_toBottomOf="@id/stopwatch"
                 app:layout_constraintEnd_toStartOf="@id/stopwatch"

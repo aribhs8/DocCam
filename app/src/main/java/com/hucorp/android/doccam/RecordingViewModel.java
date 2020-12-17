@@ -2,6 +2,7 @@ package com.hucorp.android.doccam;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.core.content.FileProvider;
 import androidx.databinding.BaseObservable;
@@ -51,6 +52,12 @@ public class RecordingViewModel extends BaseObservable
     {
         SimpleDateFormat formatter = new SimpleDateFormat("hh:mm:ss", Locale.CANADA);
         return formatter.format(mRecording.getDate());
+    }
+
+    @Bindable
+    public String getDuration()
+    {
+        return "Duration: " + mRecording.getDuration();
     }
 
     public void onClick()

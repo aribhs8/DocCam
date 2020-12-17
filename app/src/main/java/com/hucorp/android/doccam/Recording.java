@@ -9,6 +9,7 @@ public class Recording
     private UUID mID;
     private String mTitle;
     private Date mDate;
+    private String mDuration;
 
     public Recording(int recording_num)
     {
@@ -56,4 +57,15 @@ public class Recording
     {
         return "VID_" + getID().toString() + ".mp4";
     }
+
+    public String getDuration()
+    {
+        return mDuration;
+    }
+
+    public void setDuration(String duration)
+    {
+        mDuration = duration;
+    }
+
 }

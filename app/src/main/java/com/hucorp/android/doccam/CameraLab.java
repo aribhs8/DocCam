@@ -112,6 +112,7 @@ public class CameraLab
         values.put(RecordingTable.Cols.UUID, recording.getID().toString());
         values.put(RecordingTable.Cols.TITLE, recording.getTitle());
         values.put(RecordingTable.Cols.DATE, recording.getDate().getTime());
+        values.put(RecordingTable.Cols.DURATION, recording.getDuration());
 
         return values;
     }

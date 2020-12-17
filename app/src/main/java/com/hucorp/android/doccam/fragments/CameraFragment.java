@@ -17,6 +17,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,21 +45,29 @@ import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+// Todo: Change Locale.CANADA to Locale.getDefault()
 public class CameraFragment extends Fragment
 {
-    // Layout elements
+    // General layout elements
     private PreviewView mViewFinder;
     private ConstraintLayout mDefaultAppBar;
     private ConstraintLayout mRecordingAppBar;
+
+    // Camera bar layout elements
     private ImageButton mCaptureBtn;
     private ImageButton mLeftBtn;
+
+    // Appbar layout elements
     private ImageButton mSettingsBtn;
     private ImageButton mFlashBtn;
+    private TextView mDurationTextView;
+    private ImageView mRecordingIndicator;
 
     //Timer
     private ImageButton mTimerBtn;
@@ -76,6 +85,8 @@ public class CameraFragment extends Fragment
     private ExecutorService mCameraExecutor;
     private Recording mRecording;
     private File mRecordingFile;
+    private Handler mDurationThread;
+    private int mSeconds;
     private boolean mIsRecording;
     public boolean mFlash;
 
@@ -85,8 +96,14 @@ public class CameraFragment extends Fragment
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mIsRecording = false;
         mCameraExecutor = Executors.newSingleThreadExecutor();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        updateUI();
     }
 
     @Override
@@ -101,18 +118,26 @@ public class CameraFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
+        mIsRecording = false;
+        mSeconds = 0;
 
-        // Initialize layout elements
+        // Initialize General layout elements
         mViewFinder = (PreviewView) v.findViewById(R.id.viewFinder);
         mDefaultAppBar = (ConstraintLayout) v.findViewById(R.id.default_appbar);
         mRecordingAppBar = (ConstraintLayout) v.findViewById(R.id.recording_appbar);
+
+        // Initialize camera bar layout elements
         mCaptureBtn = (ImageButton) v.findViewById(R.id.captureBtn);
         mLeftBtn = (ImageButton) v.findViewById(R.id.left_cameraBtn);
         mSettingsBtn = (ImageButton) v.findViewById(R.id.settingsBtn);
+
+        // Initialize app bar layout elements
+        mDurationTextView = (TextView) v.findViewById(R.id.stopwatch);
+        mRecordingIndicator = (ImageView) v.findViewById(R.id.recording_indicator);
         mFlashBtn = (ImageButton) v.findViewById(R.id.flashBtn);
 
         timerBarBtn = (ProgressBar) v.findViewById(R.id.timerBar);
-        timerBarBtn.setVisibility(v.GONE);
+        timerBarBtn.setVisibility(View.GONE);
 
         // Timer
         mTimerBtn = (ImageButton) v.findViewById(R.id.timerBtn);
@@ -124,11 +149,11 @@ public class CameraFragment extends Fragment
         m5Timer = false;
         m10Timer = false;
 
-        mFiveTimerBtn.setVisibility(v.GONE);
-        mTenTimerBtn.setVisibility(v.GONE);
+        mFiveTimerBtn.setVisibility(View.GONE);
+        mTenTimerBtn.setVisibility(View.GONE);
         mtimedisplay = (TextView) v.findViewById(R.id.timedisplay);
 
-        mtimedisplay.setVisibility(v.GONE);
+        mtimedisplay.setVisibility(View.GONE);
 
         initCamera();               // Check for permissions and start camera
         controlCameraBarInput();    // Poll for user input on camera bar
@@ -386,12 +411,32 @@ public class CameraFragment extends Fragment
             mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
             mDefaultAppBar.setVisibility(View.GONE);
             mRecordingAppBar.setVisibility(View.VISIBLE);
+            mDurationThread = new Handler();
+            mDurationThread.postDelayed(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    mDurationThread.postDelayed(this, 500);
+                    mSeconds++;
+                    if (mSeconds % 2 == 0)
+                    {
+                        int minutes = (mSeconds/2 % 3600*2) / 60;
+                        int secs = mSeconds/2 % 60;
+                        String time = String.format(Locale.getDefault(), "%02d:%02d", minutes, secs);
+                        mDurationTextView.setText(time);
+                        mRecording.setDuration(time);
+                    }
+                    mRecordingIndicator.setVisibility(mSeconds % 2 == 0 ? View.INVISIBLE : View.VISIBLE);
+                }
+            }, 500);
         } else
         {
             // Camera is idle
             mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
             mRecordingAppBar.setVisibility(View.GONE);
             mDefaultAppBar.setVisibility(View.VISIBLE);
+            mDurationTextView.setText(R.string.recording_duration);
         }
     }
 
@@ -434,9 +479,9 @@ public class CameraFragment extends Fragment
             @Override
             public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults)
             {
-                Uri uri = FileProvider.getUriForFile(getActivity(),
-                        "com.hucorp.android.doccam.fileprovider",
-                        mRecordingFile);
+                mIsRecording = false;       // Might need to remove this later
+                mSeconds = 0;
+                mDurationThread.removeCallbacksAndMessages(null);        // Stop duration stopwatch
                 CameraLab.get(getActivity()).addRecording(mRecording);
                 Toast.makeText(getContext(), mRecording.getTitle() + " Created", Toast.LENGTH_SHORT).show();
                 updateUI();
