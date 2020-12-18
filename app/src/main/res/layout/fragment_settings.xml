@@ -129,7 +129,7 @@
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <TextView
-                                android:id="@+id/textView2"
+                                android:id="@+id/gdrive_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="10dp"
@@ -148,7 +148,8 @@
                                 android:src="@drawable/ic_baseline_keyboard_arrow_down_24"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                app:layout_constraintTop_toTopOf="parent"
+                                android:visibility="gone"/>
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -218,10 +219,11 @@
 
                         <Button
                             android:id="@+id/gdrive_authenticate"
-                            android:layout_width="80dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="40dp"
                             android:layout_marginEnd="28dp"
-                            android:text="SIGN IN"
+                            android:text="LOG OUT"
+                            android:backgroundTint="@color/red"
                             android:textSize="10dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -356,10 +358,11 @@
 
                         <Button
                             android:id="@+id/dropbox_authenticate"
-                            android:layout_width="80dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="40dp"
                             android:layout_marginEnd="28dp"
-                            android:text="SIGN IN"
+                            android:text="LOG OUT"
+                            android:backgroundTint="@color/red"
                             android:textSize="10dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -499,7 +502,8 @@
                             android:layout_width="80dp"
                             android:layout_height="40dp"
                             android:layout_marginEnd="28dp"
-                            android:text="SIGN IN"
+                            android:text="LOG OUT"
+                            android:backgroundTint="@color/red"
                             android:textSize="10dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
