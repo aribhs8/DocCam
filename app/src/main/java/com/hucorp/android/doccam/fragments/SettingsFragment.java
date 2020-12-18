@@ -44,7 +44,6 @@ import java.util.concurrent.Executor;
 public class SettingsFragment extends Fragment {
 
     private static final int RC_SIGN_IN = 0 ;
-
     public static SettingsFragment newInstance()
     {
         return new SettingsFragment();
@@ -54,8 +53,8 @@ public class SettingsFragment extends Fragment {
     private CardView gdrive_expand, dropbox_expand, onedrive_expand, youtube_expand, twitch_expand;
     private ImageView drive_arrow, dropbox_arrow, onedrive_arrow, youtube_arrow, twitch_arrow;
     private Button privacy_policy, terms_conditions, gdrive_authenticate;
-    private TextView gdrive_text;
-    private String personName, personGivenName, personFamilyName, personEmail, personId, personPhoto;
+    private TextView gdrive_text, gdrive_name;
+    private String personName, personGivenName, personFamilyName, personEmail;
 
     //Google sign in
     GoogleSignInClient mGoogleSignInClient;
@@ -79,7 +78,6 @@ public class SettingsFragment extends Fragment {
 
         mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
     }
-
 
 
     @Nullable
@@ -107,6 +105,7 @@ public class SettingsFragment extends Fragment {
         terms_conditions = v.findViewById(R.id.term_conditions);
         gdrive_authenticate = v.findViewById(R.id.gdrive_authenticate);
         gdrive_text = v.findViewById(R.id.gdrive_text);
+        gdrive_name = v.findViewById(R.id.gdrive_name);
 
         GoogleSignIn();
         ButtonsOnClickListener();
@@ -187,12 +186,7 @@ public class SettingsFragment extends Fragment {
         gdrive_authenticate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getContext());
-                if(acct == null){
-                    GoogleHandleSignIn();
-                } else {
-                    signOut();
-                }
+               signOut();
             }
         });
 
@@ -235,7 +229,7 @@ public class SettingsFragment extends Fragment {
                 .addOnCompleteListener((Activity) getContext(), new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(getContext(), "Succesfully signed out", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Successfully signed out", Toast.LENGTH_SHORT).show();
                         gdrive_text.setText("Sync with Google Drive");
                         gdrive_expand.setVisibility(View.GONE);
                         drive_arrow.setVisibility(View.GONE);
@@ -250,11 +244,11 @@ public class SettingsFragment extends Fragment {
             personGivenName = acct.getGivenName();
             personFamilyName = acct.getFamilyName();
             personEmail = acct.getEmail();
-            personId = acct.getId();
             gdrive_authenticate.setText("Log out");
             gdrive_authenticate.setBackgroundColor(Color.parseColor("#FF0000"));
             gdrive_text.setText(personEmail);
             drive_arrow.setVisibility(View.VISIBLE);
+            gdrive_name.setText("Signed in as "+ personGivenName + " " + personFamilyName);
         }
     }
 }
