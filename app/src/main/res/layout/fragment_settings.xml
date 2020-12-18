@@ -129,7 +129,7 @@
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <TextView
-                                android:id="@+id/textView2"
+                                android:id="@+id/gdrive_text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="10dp"
@@ -148,7 +148,8 @@
                                 android:src="@drawable/ic_baseline_keyboard_arrow_down_24"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                app:layout_constraintTop_toTopOf="parent"
+                                android:visibility="gone"/>
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -178,6 +179,19 @@
                         app:layout_constraintTop_toBottomOf="@+id/cardView"
                         tools:layout_editor_absoluteX="24dp">
 
+                        <TextView
+                            android:id="@+id/gdrive_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="15dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="5dp"
+                            android:text="Signed in as "
+                            android:textColor="@color/red"
+                            android:textSize="13dp"
+                            app:layout_constraintBottom_toTopOf="@+id/gdrive_settings"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <RadioGroup
                             android:id="@+id/gdrive_settings"
@@ -187,41 +201,42 @@
                             android:scaleY="0.8"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toStartOf="@+id/gdrive_authenticate"
+                            app:layout_constraintHorizontal_bias="0"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintHorizontal_bias="0">
+                            app:layout_constraintVertical_bias="0.892">
 
                             <RadioButton
+                                android:id="@+id/gdrive_sync"
                                 android:layout_width="wrap_content"
                                 android:layout_height="20dp"
                                 android:layout_marginBottom="3dp"
-                                android:text="Sync media"
-                                android:id="@+id/gdrive_sync"/>
+                                android:text="Sync media" />
 
                             <RadioButton
-                                android:layout_width="wrap_content"
-                                android:layout_height="20dp"
-                                android:layout_marginBottom="3dp"
-                                android:text="Online only"
                                 android:id="@+id/gdrive_online"
-                                />
-
-                            <RadioButton
                                 android:layout_width="wrap_content"
                                 android:layout_height="20dp"
                                 android:layout_marginBottom="3dp"
-                                android:text="Disable sync"
-                                android:id="@+id/gdrive_disable"/>
+                                android:text="Online only" />
+
+                            <RadioButton
+                                android:id="@+id/gdrive_disable"
+                                android:layout_width="wrap_content"
+                                android:layout_height="20dp"
+                                android:layout_marginBottom="3dp"
+                                android:text="Disable sync" />
 
 
                         </RadioGroup>
 
                         <Button
                             android:id="@+id/gdrive_authenticate"
-                            android:layout_width="80dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="40dp"
                             android:layout_marginEnd="28dp"
-                            android:text="SIGN IN"
+                            android:text="LOG OUT"
+                            android:backgroundTint="@color/red"
                             android:textSize="10dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -356,10 +371,11 @@
 
                         <Button
                             android:id="@+id/dropbox_authenticate"
-                            android:layout_width="80dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="40dp"
                             android:layout_marginEnd="28dp"
-                            android:text="SIGN IN"
+                            android:text="LOG OUT"
+                            android:backgroundTint="@color/red"
                             android:textSize="10dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -499,7 +515,8 @@
                             android:layout_width="80dp"
                             android:layout_height="40dp"
                             android:layout_marginEnd="28dp"
-                            android:text="SIGN IN"
+                            android:text="LOG OUT"
+                            android:backgroundTint="@color/red"
                             android:textSize="10dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
