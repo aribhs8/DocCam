@@ -42,6 +42,8 @@ import com.hucorp.android.doccam.Recording;
 import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -64,8 +66,9 @@ public class CameraFragment extends Fragment
     private ProgressBar timerBarBtn;
 
     private TextView mtimedisplay;
+    private TextView mbuttontimedisplay;
 
-
+    private ImageButton mCancelTimerBtn;
 
     // Camera control
     private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
@@ -75,6 +78,7 @@ public class CameraFragment extends Fragment
     private boolean mIsRecording;
     public boolean mFlash;
     public boolean mTimer;
+    public boolean timercancelled = false;
 
     public boolean m5Timer;
     public boolean m10Timer;
@@ -117,6 +121,9 @@ public class CameraFragment extends Fragment
         mFiveTimerBtn = (Button) v.findViewById(R.id.fivetimer);
         mTenTimerBtn = (Button) v.findViewById(R.id.tentimer);
 
+        mCancelTimerBtn = (ImageButton) v.findViewById(R.id.canceltimer);
+        mCancelTimerBtn.setVisibility(v.GONE);
+
         mTimer = true;
         mFlash = true;
         m5Timer = false;
@@ -125,8 +132,13 @@ public class CameraFragment extends Fragment
         mFiveTimerBtn.setVisibility(v.GONE);
         mTenTimerBtn.setVisibility(v.GONE);
         mtimedisplay = (TextView) v.findViewById(R.id.timedisplay);
-
         mtimedisplay.setVisibility(v.GONE);
+
+        mbuttontimedisplay = (TextView) v.findViewById(R.id.timebuttondisplay);
+        mbuttontimedisplay.setVisibility(v.GONE);
+
+
+
 
         initCamera();               // Check for permissions and start camera
         controlCameraBarInput();    // Poll for user input on camera bar
@@ -167,6 +179,9 @@ public class CameraFragment extends Fragment
                     mIsRecording = false;
                     mLeftBtn.setEnabled(true);
 
+                    mSettingsBtn.setEnabled(true);
+                    mTimerBtn.setEnabled(true);
+
                     CameraLab lab = CameraLab.get(getActivity());
                     Recording recording = new Recording(lab.getNumberOfRecordings()+1);
                     lab.addRecording(recording);
@@ -174,25 +189,50 @@ public class CameraFragment extends Fragment
                     record(recording);
 
                     mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
-                } else
+                }
+                else
                 {
+                    mSettingsBtn.setEnabled(false);
+                    mTimerBtn.setEnabled(false);
+
                     if (m5Timer) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             timerBarBtn.setVisibility(v.VISIBLE);
-                            timerBarBtn.setProgress(10,true);
+                            timerBarBtn.setProgress(20,true);
                         }
+
+                        mbuttontimedisplay.setVisibility(v.VISIBLE);
+                        mCaptureBtn.setEnabled(false);
+                        mCancelTimerBtn.setVisibility(v.VISIBLE);
+
+
+                        mCancelTimerBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                timercancelled = true;
+                                mCancelTimerBtn.setVisibility(v.GONE);
+                            }
+                        });
+
+                        timerbuttondisplay();
+
+
                         Runnable r = new Runnable() {
                             @Override
                             public void run(){
+                                mbuttontimedisplay.setVisibility(v.GONE);
+                                mbuttontimedisplay.setText("");
                                 timerBarBtn.setVisibility(v.GONE);
                                 mIsRecording = true;
                                 mLeftBtn.setEnabled(false);
                                 mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
                                 mVideoCapture.stopRecording();
+                                mCaptureBtn.setEnabled(true);
                             }
                         };
                         Handler h = new Handler();
                         h.postDelayed(r, 5000); // <-- the "1000" is the delay time in miliseconds.
+
                     }
 
                     else if (m10Timer) {
@@ -202,14 +242,23 @@ public class CameraFragment extends Fragment
                             timerBarBtn.setProgress(10,true);
                         }
 
+                        mbuttontimedisplay.setVisibility(v.VISIBLE);
+                        mCaptureBtn.setEnabled(false);
+                        mCancelTimerBtn.setVisibility(v.VISIBLE);
+                        timerbuttondisplay10();
+
+
                         Runnable r = new Runnable() {
                             @Override
                             public void run(){
+                                mbuttontimedisplay.setVisibility(v.GONE);
+                                mbuttontimedisplay.setText("");
                                 timerBarBtn.setVisibility(v.GONE);
                                 mIsRecording = true;
                                 mLeftBtn.setEnabled(false);
                                 mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
                                 mVideoCapture.stopRecording();
+                                mCaptureBtn.setEnabled(true);
                             }
                         };
                         Handler h = new Handler();
@@ -235,6 +284,199 @@ public class CameraFragment extends Fragment
                 startActivity(intent);
             }
         });
+    }
+
+    private void timerbuttondisplay10() {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r1 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("10");
+
+
+            }
+        };
+        Handler h1 = new Handler();
+        h1.postDelayed(r1, 0000); // <-- the "1000" is the delay time in miliseconds.
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r2 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("9");
+
+
+            }
+        };
+        Handler h2 = new Handler();
+        h2.postDelayed(r2, 1000); // <-- the "1000" is the delay time in miliseconds.
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r3 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("8");
+
+
+            }
+        };
+        Handler h3 = new Handler();
+        h3.postDelayed(r3, 2000); // <-- the "1000" is the delay time in miliseconds.
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r4 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("7");
+
+
+            }
+        };
+        Handler h4 = new Handler();
+        h4.postDelayed(r4, 3000); // <-- the "1000" is the delay time in miliseconds.
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r5 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("6");
+            }
+        };
+        Handler h5 = new Handler();
+        h5.postDelayed(r5, 4000); // <-- the "1000" is the delay time in miliseconds.
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r6 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("5");
+            }
+        };
+        Handler h6 = new Handler();
+        h6.postDelayed(r6, 5000); // <-- the "1000" is the delay time in miliseconds.
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r7 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("4");
+            }
+        };
+        Handler h7 = new Handler();
+        h7.postDelayed(r7, 6000); // <-- the "1000" is the delay time in miliseconds.
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r8 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("3");
+            }
+        };
+        Handler h8 = new Handler();
+        h8.postDelayed(r8, 7000); // <-- the "1000" is the delay time in miliseconds.
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r9 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("2");
+            }
+        };
+        Handler h9 = new Handler();
+        h9.postDelayed(r9, 8000); // <-- the "1000" is the delay time in miliseconds.
+////////////////////////////////////////////////////////////////////////
+        Runnable r10 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("1");
+            }
+        };
+        Handler h10 = new Handler();
+        h10.postDelayed(r10, 9000); // <-- the "1000" is the delay time in miliseconds.
+    }
+
+    private void timerbuttondisplay() {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r1 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("5");
+
+
+            }
+        };
+        Handler h1 = new Handler();
+        h1.postDelayed(r1, 0000); // <-- the "1000" is the delay time in miliseconds.
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r2 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("4");
+
+
+            }
+        };
+        Handler h2 = new Handler();
+        h2.postDelayed(r2, 1000); // <-- the "1000" is the delay time in miliseconds.
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r3 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("3");
+
+
+            }
+        };
+        Handler h3 = new Handler();
+        h3.postDelayed(r3, 2000); // <-- the "1000" is the delay time in miliseconds.
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r4 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("2");
+
+
+            }
+        };
+        Handler h4 = new Handler();
+        h4.postDelayed(r4, 3000); // <-- the "1000" is the delay time in miliseconds.
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        Runnable r5 = new Runnable() {
+            @Override
+            public void run(){
+                mbuttontimedisplay.setText("1");
+            }
+        };
+        Handler h5 = new Handler();
+        h5.postDelayed(r5, 4000); // <-- the "1000" is the delay time in miliseconds.
+
+
     }
 
     private void controlAppBarInput()
@@ -322,12 +564,14 @@ public class CameraFragment extends Fragment
                     mtimedisplay.setText("5s");
                     mtimedisplay.setVisibility(v.GONE);
 
+                    mbuttontimedisplay.setText("5");
                 } else
                 {
                     m5Timer = true;
                     mtimedisplay.setText("5s");
                     mtimedisplay.setVisibility(v.VISIBLE);
 
+                    mbuttontimedisplay.setText("5");
                 }
             }
         });
@@ -358,12 +602,15 @@ public class CameraFragment extends Fragment
                     mtimedisplay.setText("10s");
                     mtimedisplay.setVisibility(v.GONE);
 
+                    mbuttontimedisplay.setText("10");
 
                 } else
                 {
                     m10Timer = true;
                     mtimedisplay.setText("10s");
                     mtimedisplay.setVisibility(v.VISIBLE);
+
+                    mbuttontimedisplay.setText("10");
                 }
             }
         });
