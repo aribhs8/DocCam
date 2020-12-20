@@ -49,7 +49,6 @@ public class CameraBar extends Toolbar implements View.OnClickListener, TimerToo
             if (mLayout.getId() == R.id.default_camera_toolbar)
             {
                 ((ImageButton) mLayout.findViewById(R.id.action_settings)).setOnClickListener(this);
-                ((ImageButton) mLayout.findViewById(R.id.action_timer)).setOnClickListener(this);
             }
         }
     }
@@ -82,10 +81,6 @@ public class CameraBar extends Toolbar implements View.OnClickListener, TimerToo
             if (b.getId() == R.id.action_settings)
             {
                 mCallbacks.onSettingsClick();
-            } else if (b.getId() == R.id.action_timer)
-            {
-                // Display timer buttons
-
             }
         }
     }

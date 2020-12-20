@@ -139,12 +139,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
         startActivity(new Intent(getActivity(), SettingsActivity.class));
     }
 
-    @Override
-    public void onTimerClick()
-    {
-
-    }
-
     /*==================================================
     *               PERMISSION CODE
     * ==================================================*/
