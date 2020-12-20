@@ -1,4 +1,4 @@
-package com.hucorp.android.doccam;
+package com.hucorp.android.doccam.helper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.hucorp.android.doccam.database.RecordingBaseHelper;
 import com.hucorp.android.doccam.database.RecordingCursorWrapper;
+import com.hucorp.android.doccam.models.Recording;
 
 import java.io.File;
 import java.util.ArrayList;

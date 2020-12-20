@@ -1,4 +1,4 @@
-package com.hucorp.android.doccam;
+package com.hucorp.android.doccam.models;
 
 import java.util.Date;
 import java.util.Locale;

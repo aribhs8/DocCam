@@ -1,7 +1,6 @@
 package com.hucorp.android.doccam.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +12,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hucorp.android.doccam.CameraLab;
+import com.hucorp.android.doccam.helper.CameraLab;
 import com.hucorp.android.doccam.R;
-import com.hucorp.android.doccam.Recording;
-import com.hucorp.android.doccam.RecordingViewModel;
+import com.hucorp.android.doccam.models.Recording;
+import com.hucorp.android.doccam.models.RecordingViewModel;
 import com.hucorp.android.doccam.databinding.FragmentRecordingListBinding;
 import com.hucorp.android.doccam.databinding.ListItemRecordingBinding;
 
-import org.w3c.dom.Text;
-
-import java.io.File;
 import java.util.List;
 import java.util.Objects;
 

@@ -1,232 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!-- Todo: Create drawable resources for differing screen sizes -->
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activities.CameraActivity">
+    android:layout_height="match_parent">
 
-    <!-- Todo: This layout needs to use less defined numbers & incorporate more drawable resources -->
-    <LinearLayout
+    <include layout="@layout/camera_appbar"
         android:id="@+id/appbar"
-        android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewFinder"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/default_appbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageButton
-                android:id="@+id/flashBtn"
-                android:layout_width="43dp"
-                android:layout_height="53dp"
-                android:layout_marginStart="8dp"
-                android:adjustViewBounds="true"
-                android:background="@android:color/transparent"
-                android:scaleType="fitCenter"
-                android:src="@drawable/flashoff"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageButton
-                android:id="@+id/timerBtn"
-                android:layout_width="43dp"
-                android:layout_height="53dp"
-                android:adjustViewBounds="true"
-                android:background="@android:color/transparent"
-                android:scaleType="fitCenter"
-                android:src="@drawable/timer"
-                app:layout_constraintEnd_toStartOf="@+id/settingsBtn"
-                app:layout_constraintHorizontal_bias="0.19"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Button
-                android:id="@+id/fivetimer"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:text="@string/five_timer"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginStart="5dp"
-                app:layout_constraintStart_toEndOf="@id/timerBtn"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                />
-
-            <Button
-                android:id="@+id/tentimer"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:text="@string/ten_timer"
-                android:textAlignment="center"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@id/fivetimer"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-            <TextView
-                android:id="@+id/timedisplay"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/timer_display"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/settingsBtn"
-                app:layout_constraintHorizontal_bias="0.996"
-                app:layout_constraintStart_toStartOf="@+id/flashBtn"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageButton
-                android:id="@+id/settingsBtn"
-                android:layout_width="43dp"
-                android:layout_height="53dp"
-                android:adjustViewBounds="true"
-                android:background="@android:color/transparent"
-                android:scaleType="fitCenter"
-                android:src="@drawable/settings"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.956"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/recording_appbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone">
-
-            <ImageButton
-                android:id="@id/flashBtn"
-                android:layout_width="43dp"
-                android:layout_height="53dp"
-                android:layout_marginStart="8dp"
-                android:adjustViewBounds="true"
-                android:background="@android:color/transparent"
-                android:scaleType="fitCenter"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:srcCompat="@drawable/flashoff" />
-
-            <ImageView
-                android:id="@+id/recording_indicator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:visibility="invisible"
-                android:contentDescription="@string/recording_indicator"
-                app:layout_constraintBottom_toBottomOf="@id/stopwatch"
-                app:layout_constraintEnd_toStartOf="@id/stopwatch"
-                app:layout_constraintTop_toTopOf="@id/stopwatch"
-                app:srcCompat="@drawable/ic_baseline_fiber_manual_record_24" />
-
-            <TextView
-                android:id="@+id/stopwatch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/recording_duration"
-                android:textSize="24sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </LinearLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/cameraBar"
+        app:layout_constraintBottom_toTopOf="@id/camera_bottom_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appbar">
+        app:layout_constraintTop_toBottomOf="@id/appbar" />
 
-    </androidx.camera.view.PreviewView>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cameraBar"
-        android:layout_width="match_parent"
+    <include
+        android:id="@+id/camera_bottom_bar"
+        layout="@layout/camera_bottom_bar"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/viewFinder">
+        android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <ImageButton
-            android:id="@+id/left_cameraBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_edges_button"
-            android:contentDescription="@string/left_camera_button"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/ic_baseline_image_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/captureBtn"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:id="@+id/captureBtn"
-            android:layout_width="78dp"
-            android:layout_height="78dp"
-            android:layout_marginTop="17dp"
-            android:layout_marginBottom="17dp"
-            android:background="@drawable/round_button"
-            android:contentDescription="@string/capture_button"
-            android:focusable="true"
-            app:srcCompat="@drawable/ic_baseline_fiber_manual_record_66"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@drawable/round_button"
-            android:contentDescription="@string/stream_button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/captureBtn"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ProgressBar
-            android:id="@+id/timerBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="67dp"
-            android:layout_height="69dp"
-            android:indeterminateTint="@color/purple_500"
-            app:layout_constraintBottom_toBottomOf="@+id/captureBtn"
-            app:layout_constraintEnd_toEndOf="@+id/captureBtn"
-            app:layout_constraintStart_toStartOf="@+id/captureBtn"
-            app:layout_constraintTop_toTopOf="@+id/captureBtn" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,109 +1,69 @@
 package com.hucorp.android.doccam.fragments;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.camera.core.Camera;
-import androidx.camera.core.CameraSelector;
-import androidx.camera.core.Preview;
-import androidx.camera.core.VideoCapture;
-import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LifecycleOwner;
 
-import com.google.common.util.concurrent.ListenableFuture;
-import com.hucorp.android.doccam.CameraLab;
-import com.hucorp.android.doccam.Constants;
-import com.hucorp.android.doccam.R;
-import com.hucorp.android.doccam.Recording;
+import com.hucorp.android.doccam.CameraBarCallbacks;
 import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
+import com.hucorp.android.doccam.helper.CameraBar;
+import com.hucorp.android.doccam.helper.Camera;
+import com.hucorp.android.doccam.Constants;
+import com.hucorp.android.doccam.R;
+import com.hucorp.android.doccam.helper.CameraLab;
+import com.hucorp.android.doccam.models.Recording;
 
-import java.io.File;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-// Todo: Change Locale.CANADA to Locale.getDefault()
-public class CameraFragment extends Fragment
+import static java.util.Objects.*;
+
+public class CameraFragment extends Fragment implements View.OnClickListener, CameraBarCallbacks
 {
-    // General layout elements
-    private PreviewView mViewFinder;
-    private ConstraintLayout mDefaultAppBar;
-    private ConstraintLayout mRecordingAppBar;
-
-    // Camera bar layout elements
+    // Layout elements
+    private CameraBar mToolbar;
     private ImageButton mCaptureBtn;
-    private ImageButton mLeftBtn;
-
-    // Appbar layout elements
-    private ImageButton mSettingsBtn;
-    private ImageButton mFlashBtn;
-    private TextView mDurationTextView;
-    private ImageView mRecordingIndicator;
-
-    //Timer
-    private ImageButton mTimerBtn;
-    private Button mFiveTimerBtn;
-    private Button mTenTimerBtn;
-    private ProgressBar timerBarBtn;
-    private TextView mtimedisplay;
-    public boolean mTimer;
-    public boolean m5Timer;
-    public boolean m10Timer;
+    private ImageButton mFileBtn;
 
     // Camera control
-    private ListenableFuture<ProcessCameraProvider> mCameraProviderFuture;
-    private VideoCapture mVideoCapture;
     private ExecutorService mCameraExecutor;
-    private Recording mRecording;
-    private File mRecordingFile;
-    private Handler mDurationThread;
-    private int mSeconds;
-    private boolean mIsRecording;
-    public boolean mFlash;
+    private Camera mCamera;
 
-    public static CameraFragment newInstance() { return new CameraFragment(); }
+    public static CameraFragment newInstance()
+    {
+        return new CameraFragment();
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         mCameraExecutor = Executors.newSingleThreadExecutor();
+        mCamera = Camera.get();
+        mCamera.setNowRecording(false);
+        mToolbar = CameraBar.newInstance(getContext());
     }
 
     @Override
-    public void onResume()
+    public void onPause()
     {
-        super.onResume();
-        updateUI();
+        super.onPause();
+        mCamera.setNowRecording(false);
     }
 
     @Override
@@ -118,326 +78,84 @@ public class CameraFragment extends Fragment
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
-        mIsRecording = false;
-        mSeconds = 0;
 
-        // Initialize General layout elements
-        mViewFinder = (PreviewView) v.findViewById(R.id.viewFinder);
-        mDefaultAppBar = (ConstraintLayout) v.findViewById(R.id.default_appbar);
-        mRecordingAppBar = (ConstraintLayout) v.findViewById(R.id.recording_appbar);
-
-        // Initialize camera bar layout elements
         mCaptureBtn = (ImageButton) v.findViewById(R.id.captureBtn);
-        mLeftBtn = (ImageButton) v.findViewById(R.id.left_cameraBtn);
-        mSettingsBtn = (ImageButton) v.findViewById(R.id.settingsBtn);
+        mFileBtn = (ImageButton) v.findViewById(R.id.fileBtn);
 
-        // Initialize app bar layout elements
-        mDurationTextView = (TextView) v.findViewById(R.id.stopwatch);
-        mRecordingIndicator = (ImageView) v.findViewById(R.id.recording_indicator);
-        mFlashBtn = (ImageButton) v.findViewById(R.id.flashBtn);
+        mCamera.defineSurface((PreviewView) v.findViewById(R.id.viewFinder));
+        mToolbar.setLayout((ConstraintLayout) v.findViewById(R.id.default_camera_toolbar));
+        mToolbar.setCallback(this);
+        initCamera();
 
-        timerBarBtn = (ProgressBar) v.findViewById(R.id.timerBar);
-        timerBarBtn.setVisibility(View.GONE);
-
-        // Timer
-        mTimerBtn = (ImageButton) v.findViewById(R.id.timerBtn);
-        mFiveTimerBtn = (Button) v.findViewById(R.id.fivetimer);
-        mTenTimerBtn = (Button) v.findViewById(R.id.tentimer);
-
-        mTimer = true;
-        mFlash = true;
-        m5Timer = false;
-        m10Timer = false;
-
-        mFiveTimerBtn.setVisibility(View.GONE);
-        mTenTimerBtn.setVisibility(View.GONE);
-        mtimedisplay = (TextView) v.findViewById(R.id.timedisplay);
-
-        mtimedisplay.setVisibility(View.GONE);
-
-        initCamera();               // Check for permissions and start camera
-        controlCameraBarInput();    // Poll for user input on camera bar
-        controlAppBarInput();       // Poll for user input in app bar
+        mCaptureBtn.setOnClickListener(this);
+        mFileBtn.setOnClickListener(this);
 
         return v;
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private void controlCameraBarInput()
+    /*==================================================
+     *             HANDLE BUTTON PRESSES
+     * ==================================================*/
+    @Override
+    public void onClick(View v)
     {
-        mCaptureBtn.setOnTouchListener(new View.OnTouchListener() {
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
+        ImageButton b = (ImageButton) v;
+        if (b.getId() == R.id.captureBtn)
+        {
+            mCamera.setNowRecording(!mCamera.isNowRecording());
+            if (mCamera.isNowRecording())
             {
-                switch (event.getAction())
-                {
-                    case MotionEvent.ACTION_DOWN:
-                        mCaptureBtn.setAlpha(0.5f);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        mCaptureBtn.setAlpha(1.0f);
-                        break;
-                }
-                return false;
-            }
-        });
-
-        mCaptureBtn.setOnClickListener(new View.OnClickListener()
-        {
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onClick(View v)
+                mCamera.record(new Recording(CameraLab.get(getActivity()).getNumberOfRecordings()+1), getContext());
+            } else
             {
-                mIsRecording = !mIsRecording;       // Toggle recording state
-                if (mIsRecording)
-                {
-                    // Camera has switched to recording state
-                    mRecording = new Recording(CameraLab.get(getActivity()).getNumberOfRecordings()+1);
-                    record();
-                    updateUI();
-                } else
-                {
-                    mVideoCapture.stopRecording();
-                }
-
-                /*
-                } else
-                {
-                    if (m5Timer) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            timerBarBtn.setVisibility(v.VISIBLE);
-                            timerBarBtn.setProgress(10,true);
-                        }
-                        Runnable r = new Runnable() {
-                            @Override
-                            public void run(){
-                                timerBarBtn.setVisibility(v.GONE);
-                                mIsRecording = true;
-                                mLeftBtn.setEnabled(false);
-                                mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
-                                mVideoCapture.stopRecording();
-                            }
-                        };
-                        Handler h = new Handler();
-                        h.postDelayed(r, 5000); // <-- the "1000" is the delay time in miliseconds.
-                    }
-
-                    else if (m10Timer) {
-
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            timerBarBtn.setVisibility(v.VISIBLE);
-                            timerBarBtn.setProgress(10,true);
-                        }
-
-                        Runnable r = new Runnable() {
-                            @Override
-                            public void run(){
-                                timerBarBtn.setVisibility(v.GONE);
-                                mIsRecording = true;
-                                mLeftBtn.setEnabled(false);
-                                mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
-                                mVideoCapture.stopRecording();
-                            }
-                        };
-                        Handler h = new Handler();
-                        h.postDelayed(r, 10000); // <-- the "1000" is the delay time in miliseconds.
-                    }
-
-                    else{
-                        mIsRecording = true;
-                        mLeftBtn.setEnabled(false);
-                        mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
-                        mVideoCapture.stopRecording();
-                    }
-                }
-
-                 */
-            }
-        });
-
-        mLeftBtn.setOnClickListener(new View.OnClickListener()
+                mCamera.stopRecording();
+            } updateUI();
+        } else if (b.getId() == R.id.fileBtn)
         {
-            @Override
-            public void onClick(View v)
-            {
-                Intent intent = new Intent(getActivity(), RecordingListActivity.class);
-                startActivity(intent);
-            }
-        });
-    }
-
-    private void controlAppBarInput()
-    {
-        mSettingsBtn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent i = new Intent(getActivity(), SettingsActivity.class);
-                startActivity(i);
-            }
-        });
-
-        mFlashBtn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                if (mFlash)
-                {
-                    mFlash = false;
-                    mFlashBtn.setImageResource(R.drawable.flash);
-                } else
-                {
-                    mFlash = true;
-                    mFlashBtn.setImageResource(R.drawable.flashoff);
-                }
-            }
-        });
-
-
-        mTimerBtn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v){
-
-                if (mTimer)
-                {
-                    mTimer = false;
-                    Animation animation1 = AnimationUtils.loadAnimation(getContext(), R.anim.fadein);
-                    mTenTimerBtn.setVisibility(v.VISIBLE);
-                    mTenTimerBtn.startAnimation(animation1);
-                    mFiveTimerBtn.setVisibility(v.VISIBLE);
-                    mFiveTimerBtn.startAnimation(animation1);
-
-                } else
-                {
-                    mTimer = true;
-                    Animation animation2 = AnimationUtils.loadAnimation(getContext(), R.anim.fadeout);
-
-                    mTenTimerBtn.startAnimation(animation2);
-                    mFiveTimerBtn.startAnimation(animation2);
-                    mFiveTimerBtn.setVisibility(v.GONE);
-                    mTenTimerBtn.setVisibility(v.GONE);
-
-                }
-            }
-        });
-
-        mFiveTimerBtn.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v){
-
-                mFiveTimerBtn.clearAnimation();
-                mTenTimerBtn.clearAnimation();
-
-                Animation animation3 = AnimationUtils.loadAnimation(getContext(), R.anim.fadeout);
-
-                mTenTimerBtn.startAnimation(animation3);
-                mFiveTimerBtn.startAnimation(animation3);
-
-                mFiveTimerBtn.setVisibility(v.GONE);
-                mTenTimerBtn.setVisibility(v.GONE);
-
-                mTimer = true;
-
-                m10Timer = false;
-
-                if (m5Timer)
-                {
-                    m5Timer = false;
-                    mtimedisplay.setText("5s");
-                    mtimedisplay.setVisibility(v.GONE);
-
-                } else
-                {
-                    m5Timer = true;
-                    mtimedisplay.setText("5s");
-                    mtimedisplay.setVisibility(v.VISIBLE);
-
-                }
-            }
-        });
-
-        mTenTimerBtn.setOnClickListener(new View.OnClickListener()
-        {
-
-            @Override
-            public void onClick(View v){
-                mFiveTimerBtn.clearAnimation();
-                mTenTimerBtn.clearAnimation();
-
-                Animation animation3 = AnimationUtils.loadAnimation(getContext(), R.anim.fadeout);
-
-                mTenTimerBtn.startAnimation(animation3);
-                mFiveTimerBtn.startAnimation(animation3);
-
-                mFiveTimerBtn.setVisibility(v.GONE);
-                mTenTimerBtn.setVisibility(v.GONE);
-
-                mTimer = true;
-
-                m5Timer = false;
-
-                if (m10Timer)
-                {
-                    m10Timer = false;
-                    mtimedisplay.setText("10s");
-                    mtimedisplay.setVisibility(v.GONE);
-
-
-                } else
-                {
-                    m10Timer = true;
-                    mtimedisplay.setText("10s");
-                    mtimedisplay.setVisibility(v.VISIBLE);
-                }
-            }
-        });
+            startActivity(new Intent(getActivity(), RecordingListActivity.class));
+        }
     }
 
     private void updateUI()
     {
-        // Todo: Add animations to make UI change smoother
-        // Toggle buttons based on recording mode
-        mLeftBtn.setEnabled(!mIsRecording);     // Disable file button
+        // Toggle buttons
+        mFileBtn.setEnabled(!mCamera.isNowRecording());
 
-        if (mIsRecording)
+        // Change layout elements
+        if (mCamera.isNowRecording())
         {
-            // Camera is recording video
             mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
-            mDefaultAppBar.setVisibility(View.GONE);
-            mRecordingAppBar.setVisibility(View.VISIBLE);
-            mDurationThread = new Handler();
-            mDurationThread.postDelayed(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    mDurationThread.postDelayed(this, 500);
-                    mSeconds++;
-                    if (mSeconds % 2 == 0)
-                    {
-                        int minutes = (mSeconds/2 % 3600*2) / 60;
-                        int secs = mSeconds/2 % 60;
-                        String time = String.format(Locale.getDefault(), "%02d:%02d", minutes, secs);
-                        mDurationTextView.setText(time);
-                        mRecording.setDuration(time);
-                    }
-                    mRecordingIndicator.setVisibility(mSeconds % 2 == 0 ? View.INVISIBLE : View.VISIBLE);
-                }
-            }, 500);
+            mToolbar.setLayout((ConstraintLayout) requireNonNull(getView()).findViewById(R.id.recording_camera_toolbar));
         } else
         {
-            // Camera is idle
             mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
-            mRecordingAppBar.setVisibility(View.GONE);
-            mDefaultAppBar.setVisibility(View.VISIBLE);
-            mDurationTextView.setText(R.string.recording_duration);
+            mToolbar.setLayout((ConstraintLayout) requireNonNull(getView()).findViewById(R.id.default_camera_toolbar));
         }
+    }
+
+    @Override
+    public void onSettingsClick()
+    {
+        startActivity(new Intent(getActivity(), SettingsActivity.class));
+    }
+
+    /*==================================================
+    *               PERMISSION CODE
+    * ==================================================*/
+    private void initCamera()
+    {
+        if (allPermissionsGranted())
+        {
+            mCamera.startCamera(getContext());
+        } else
+        {
+            requestPermissions(Constants.REQUIRED_PERMISSIONS.toArray(new String[0]), Constants.REQUEST_CODE_PERMISSIONS);
+        }
+    }
+
+    private boolean allPermissionsGranted()
+    {
+        return ContextCompat.checkSelfPermission(requireNonNull(getContext()), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -448,87 +166,12 @@ public class CameraFragment extends Fragment
         {
             if (allPermissionsGranted())
             {
-                startCamera();
+                mCamera.startCamera(getContext());
             } else
             {
                 Toast.makeText(getContext(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
                 // Todo: Open a dialog here that tells the user they cannot use app without permission (remove Toast)
             }
         }
-    }
-
-    private void initCamera()
-    {
-        if (allPermissionsGranted())
-        {
-            startCamera();
-        } else
-        {
-            requestPermissions(Constants.REQUIRED_PERMISSIONS.toArray(new String[0]), Constants.REQUEST_CODE_PERMISSIONS);
-        }
-    }
-
-    @SuppressLint("RestrictedApi")
-    private void record()
-    {
-        mRecordingFile = CameraLab.get(getActivity()).getRecordingFile(mRecording);
-        VideoCapture.OutputFileOptions outputFileOptions = new VideoCapture.OutputFileOptions.Builder(mRecordingFile).build();
-
-        mVideoCapture.startRecording(outputFileOptions, ContextCompat.getMainExecutor(getContext()), new VideoCapture.OnVideoSavedCallback()
-        {
-            @Override
-            public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults)
-            {
-                mIsRecording = false;       // Might need to remove this later
-                mSeconds = 0;
-                mDurationThread.removeCallbacksAndMessages(null);        // Stop duration stopwatch
-                CameraLab.get(getActivity()).addRecording(mRecording);
-                Toast.makeText(getContext(), mRecording.getTitle() + " Created", Toast.LENGTH_SHORT).show();
-                updateUI();
-            }
-
-            @Override
-            public void onError(int videoCaptureError, @NonNull String message, @Nullable Throwable cause)
-            {
-
-            }
-        });
-    }
-
-    private void startCamera()
-    {
-        mCameraProviderFuture = ProcessCameraProvider.getInstance(Objects.requireNonNull(getContext()));
-
-        mCameraProviderFuture.addListener(() -> {
-            try {
-                ProcessCameraProvider cameraProvider = mCameraProviderFuture.get();
-                bindPreview(cameraProvider);
-            } catch (ExecutionException | InterruptedException e) {
-                // No errors need to be handled for this Future.
-                // This should never be reached.
-            }
-        }, ContextCompat.getMainExecutor(getContext()));
-    }
-
-    private void bindPreview(@NonNull ProcessCameraProvider cameraProvider)
-    {
-        Preview preview = new Preview.Builder()
-                .build();
-
-        mVideoCapture = new VideoCapture.Builder()
-                .build();
-
-        CameraSelector cameraSelector = new CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                .build();
-
-        preview.setSurfaceProvider(mViewFinder.getSurfaceProvider());
-
-        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) Objects.requireNonNull(getActivity()), cameraSelector, preview, mVideoCapture);
-    }
-
-    private boolean allPermissionsGranted()
-    {
-        return ContextCompat.checkSelfPermission(Objects.requireNonNull(getContext()), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 }

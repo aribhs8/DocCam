@@ -6,7 +6,7 @@
         <import type="android.view.View" />
         <variable
             name="viewModel"
-            type="com.hucorp.android.doccam.RecordingViewModel" />
+            type="com.hucorp.android.doccam.models.RecordingViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView

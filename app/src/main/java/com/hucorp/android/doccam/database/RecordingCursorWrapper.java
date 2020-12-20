@@ -3,7 +3,7 @@ package com.hucorp.android.doccam.database;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
-import com.hucorp.android.doccam.Recording;
+import com.hucorp.android.doccam.models.Recording;
 
 import java.util.Date;
 import java.util.UUID;

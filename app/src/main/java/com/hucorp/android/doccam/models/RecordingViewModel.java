@@ -1,12 +1,13 @@
-package com.hucorp.android.doccam;
+package com.hucorp.android.doccam.models;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.core.content.FileProvider;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
+
+import com.hucorp.android.doccam.helper.CameraLab;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
