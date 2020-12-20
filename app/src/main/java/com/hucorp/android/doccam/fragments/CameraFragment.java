@@ -17,7 +17,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.hucorp.android.doccam.CameraBarCallbacks;
+import com.hucorp.android.doccam.interfaces.CameraBarCallbacks;
 import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
 import com.hucorp.android.doccam.helper.CameraBar;
@@ -27,7 +27,6 @@ import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.helper.CameraLab;
 import com.hucorp.android.doccam.models.Recording;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -105,7 +104,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
             mCamera.setNowRecording(!mCamera.isNowRecording());
             if (mCamera.isNowRecording())
             {
-                mCamera.record(new Recording(CameraLab.get(getActivity()).getNumberOfRecordings()+1), getContext());
+                mCamera.record(getContext(), new Recording(CameraLab.get(getActivity()).getNumberOfRecordings()+1));
             } else
             {
                 mCamera.stopRecording();
@@ -126,6 +125,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
         {
             mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
             mToolbar.setLayout((ConstraintLayout) requireNonNull(getView()).findViewById(R.id.recording_camera_toolbar));
+            mToolbar.updateDuration();
         } else
         {
             mCaptureBtn.setImageResource(R.drawable.ic_baseline_fiber_manual_record_66);
@@ -137,6 +137,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
     public void onSettingsClick()
     {
         startActivity(new Intent(getActivity(), SettingsActivity.class));
+    }
+
+    @Override
+    public void onTimerClick()
+    {
+
     }
 
     /*==================================================

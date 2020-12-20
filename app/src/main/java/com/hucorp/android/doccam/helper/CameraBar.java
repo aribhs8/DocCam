@@ -1,31 +1,23 @@
 package com.hucorp.android.doccam.helper;
 
 import android.content.Context;
-import android.text.Layout;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.hucorp.android.doccam.CameraBarCallbacks;
-import com.hucorp.android.doccam.Constants;
+import com.hucorp.android.doccam.interfaces.CameraBarCallbacks;
 import com.hucorp.android.doccam.R;
+import com.hucorp.android.doccam.interfaces.TimerToolbarCallbacks;
 
-// Todo: Find efficient way to load onClickListeners
-public class CameraBar extends Toolbar implements View.OnClickListener
+public class CameraBar extends Toolbar implements View.OnClickListener, TimerToolbarCallbacks
 {
     private CameraBarCallbacks mCallbacks;
 
     // Control layout elements
     private View mLayout;
-
-    // Default layout elements
-    private ImageButton mSettingsBtn;
-    private ImageButton mFlashBtn;
-    private ImageButton mTimerBtn;
 
     public static CameraBar newInstance(Context context)
     {
@@ -47,6 +39,38 @@ public class CameraBar extends Toolbar implements View.OnClickListener
         if (mLayout != null) mLayout.setVisibility(View.GONE);
         mLayout = layout;
         mLayout.setVisibility(View.VISIBLE);
+        this.setListeners();
+    }
+
+    private void setListeners()
+    {
+        if (mLayout != null)
+        {
+            if (mLayout.getId() == R.id.default_camera_toolbar)
+            {
+                ((ImageButton) mLayout.findViewById(R.id.action_settings)).setOnClickListener(this);
+                ((ImageButton) mLayout.findViewById(R.id.action_timer)).setOnClickListener(this);
+            }
+        }
+    }
+
+    public void updateDuration()
+    {
+        ((TextView) mLayout.findViewById(R.id.stopwatch)).setText(R.string.recording_duration);
+        Timer.setToolbarCallback(this);
+        Timer.runHalfSecondTimer();
+    }
+
+    @Override
+    public void updateDurationText()
+    {
+        ((TextView) mLayout.findViewById(R.id.stopwatch)).setText(Timer.getTimeElapsed());
+    }
+
+    @Override
+    public void updateIndicator(int seconds)
+    {
+        mLayout.findViewById(R.id.recording_indicator).setVisibility(seconds % 2 == 0 ? View.INVISIBLE : View.VISIBLE);
     }
 
     @Override
@@ -58,63 +82,11 @@ public class CameraBar extends Toolbar implements View.OnClickListener
             if (b.getId() == R.id.action_settings)
             {
                 mCallbacks.onSettingsClick();
+            } else if (b.getId() == R.id.action_timer)
+            {
+                // Display timer buttons
+
             }
         }
     }
 }
-
-/*
-public class AppBar extends Toolbar implements View.OnClickListener
-{
-    private Toolbar mToolbar;
-    private View mView;
-
-    private ImageButton mSettingsBtn;
-    private ImageButton mFlashBtn;
-
-    public AppBar(@NonNull Context context, View view)
-    {
-        super(context);
-        mView = view;
-        this.switchToDefaultMode();
-    }
-
-    public AppBar(Context context)
-    {
-        super(context);
-    }
-
-    public void switchToDefaultMode()
-    {
-        mToolbar = mView.findViewById(R.id.camera_default_appbar);
-
-        mSettingsBtn = mView.findViewById(R.id.action_settings);
-        mFlashBtn = mView.findViewById(R.id.action_flash);
-
-        this.processDefaultInput();
-    }
-
-    private void processDefaultInput()
-    {
-        mSettingsBtn.setOnClickListener(this);
-        mFlashBtn.setOnClickListener(this);
-    }
-
-    @SuppressLint("NonConstantResourceId")
-    @Override
-    public void onClick(View v)
-    {
-        ImageButton b = (ImageButton) v;
-        switch (b.getId())
-        {
-            case R.id.action_settings:
-                Toast.makeText(getContext(), "Settings", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.action_flash:
-                Toast.makeText(getContext(), "Flash", Toast.LENGTH_SHORT).show();
-                break;
-        }
-    }
-}
-
- */

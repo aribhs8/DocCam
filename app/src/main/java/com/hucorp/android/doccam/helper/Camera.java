@@ -88,19 +88,20 @@ public class Camera
     }
 
     @SuppressLint("RestrictedApi")
-    public void record(Recording recording, Context context)
+    public void record(Context context, Recording recording)
     {
         File recordingFile = CameraLab.get(context).getRecordingFile(recording);
         VideoCapture.OutputFileOptions outputFileOptions = new VideoCapture.OutputFileOptions.Builder(recordingFile).build();
-
 
         mVideoCapture.startRecording(outputFileOptions, ContextCompat.getMainExecutor(context), new VideoCapture.OnVideoSavedCallback()
         {
             @Override
             public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults)
             {
+                recording.setDuration(Timer.getTimeElapsed());
                 CameraLab.get(context).addRecording(recording);
                 setNowRecording(false);
+                Timer.resetTimer();
             }
 
             @Override
