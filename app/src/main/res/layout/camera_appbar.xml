@@ -1,0 +1,10 @@
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/camera_toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    app:contentInsetEnd="16dp">
+
+    <include layout="@layout/camera_default_toolbar_layout" />
+    <include layout="@layout/camera_recording_toolbar_layout" />
+</androidx.appcompat.widget.Toolbar>

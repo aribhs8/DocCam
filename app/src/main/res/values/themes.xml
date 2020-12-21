@@ -12,10 +12,11 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="android:windowNoTitle">true</item>
     </style>
 
     <!-- Camera View Theme -->
-    <style name="Theme.DocCam.Camera" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.DocCam.Camera" parent="Theme.AppCompat.NoActionBar">
         <!-- Primary brand color -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/transparent</item>
@@ -24,5 +25,7 @@
         <item name="android:windowBackground">@color/black</item>
         <!-- Status bar color -->
         <item name="android:statusBarColor" tools:targetApi="1">?attr/colorPrimaryVariant</item>
+        <!-- Text colors -->
+        <item name="android:textColor">@color/white</item>
     </style>
 </resources>

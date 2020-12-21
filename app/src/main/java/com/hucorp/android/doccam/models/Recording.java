@@ -1,16 +1,15 @@
-package com.hucorp.android.doccam;
+package com.hucorp.android.doccam.models;
 
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
-
-// Todo: Use accompanying ViewModel with recording?
 
 public class Recording
 {
     private UUID mID;
     private String mTitle;
     private Date mDate;
+    private String mDuration;
 
     public Recording(int recording_num)
     {
@@ -58,4 +57,15 @@ public class Recording
     {
         return "VID_" + getID().toString() + ".mp4";
     }
+
+    public String getDuration()
+    {
+        return mDuration;
+    }
+
+    public void setDuration(String duration)
+    {
+        mDuration = duration;
+    }
+
 }

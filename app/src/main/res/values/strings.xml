@@ -10,4 +10,10 @@
     <string name="stream_button">Stream</string>
     <string name="five_timer">5 sec</string>
     <string name="ten_timer">10 sec</string>
+    <string name="timer_display">5s</string>
+    <string name="recording_duration">00:00</string>
+    <string name="recording_indicator">Recording Indicator</string>
+    <string name="settings">Settings</string>
+    <string name="flash">Flash</string>
+    <string name="timer">Timer</string>
 </resources>

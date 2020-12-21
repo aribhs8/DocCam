@@ -22,7 +22,8 @@ public class RecordingBaseHelper extends SQLiteOpenHelper
                 " _id integer primary key autoincrement, " +
                 RecordingTable.Cols.UUID + ", " +
                 RecordingTable.Cols.TITLE + ", " +
-                RecordingTable.Cols.DATE +
+                RecordingTable.Cols.DATE + ", " +
+                RecordingTable.Cols.DURATION +
                 ")"
         );
     }

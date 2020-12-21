@@ -1,4 +1,4 @@
-package com.hucorp.android.doccam;
+package com.hucorp.android.doccam.models;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,6 +6,8 @@ import android.content.Intent;
 import androidx.core.content.FileProvider;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
+
+import com.hucorp.android.doccam.helper.CameraLab;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -53,11 +55,18 @@ public class RecordingViewModel extends BaseObservable
         return formatter.format(mRecording.getDate());
     }
 
+    @Bindable
+    public String getDuration()
+    {
+        return "Duration: " + mRecording.getDuration();
+    }
+
     public void onClick()
     {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider", CameraLab.get(mContext).getRecordingFile(mRecording)), "video/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.setDataAndType(FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider",
+                CameraLab.get(mContext).getRecordingFile(mRecording)), "video/*").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(mContext, intent, null);
     }
 }

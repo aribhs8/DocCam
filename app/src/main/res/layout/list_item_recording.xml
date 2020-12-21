@@ -6,7 +6,7 @@
         <import type="android.view.View" />
         <variable
             name="viewModel"
-            type="com.hucorp.android.doccam.RecordingViewModel" />
+            type="com.hucorp.android.doccam.models.RecordingViewModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -53,10 +53,10 @@
                     android:text="@{viewModel.dateFormatted}" />
 
                 <TextView
-                    android:id="@+id/recording_duration"
+                    android:id="@+id/recording_duration_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/duration"/>
+                    android:text="@{viewModel.duration}"/>
 
             </LinearLayout>
 
