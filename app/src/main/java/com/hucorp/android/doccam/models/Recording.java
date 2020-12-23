@@ -58,6 +58,8 @@ public class Recording
         return "VID_" + getID().toString() + ".mp4";
     }
 
+    public String getThumbnailFileName() { return "IMG_" + getTitle() + ".png"; }
+
     public String getDuration()
     {
         return mDuration;

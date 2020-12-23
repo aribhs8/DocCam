@@ -1,9 +1,14 @@
 package com.hucorp.android.doccam.fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +17,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.camera.core.VideoCapture;
 import androidx.camera.view.PreviewView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.hucorp.android.doccam.helper.PictureUtils;
 import com.hucorp.android.doccam.interfaces.CameraBarCallbacks;
 import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
@@ -27,12 +34,16 @@ import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.helper.CameraLab;
 import com.hucorp.android.doccam.models.Recording;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static java.util.Objects.*;
 
-public class CameraFragment extends Fragment implements View.OnClickListener, CameraBarCallbacks
+public class CameraFragment extends Fragment implements View.OnClickListener, CameraBarCallbacks, VideoCapture.OnVideoSavedCallback
 {
     // Layout elements
     private CameraBar mToolbar;
@@ -42,6 +53,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
     // Camera control
     private ExecutorService mCameraExecutor;
     private Camera mCamera;
+
+    // Recording info
+    private Recording mRecording;
 
     public static CameraFragment newInstance()
     {
@@ -56,6 +70,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
         mCamera = Camera.get();
         mCamera.setNowRecording(false);
         mToolbar = CameraBar.newInstance(getContext());
+        mRecording = CameraLab.get(getActivity()).getLastRecording();
     }
 
     @Override
@@ -86,10 +101,29 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
         mToolbar.setCallback(this);
         initCamera();
 
+        mFileBtn.setImageBitmap(PictureUtils.getScaledBitmap(CameraLab.get(getActivity())
+                .getThumbnailFile(mRecording).getPath(), getActivity()));
+        mFileBtn.setClipToOutline(true);
+
         mCaptureBtn.setOnClickListener(this);
         mFileBtn.setOnClickListener(this);
 
         return v;
+    }
+
+    @Override
+    public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults)
+    {
+        CameraLab.get(getActivity()).saveThumbnailFromVideo(mRecording);        // Create & save thumbnail
+        CameraLab.get(getActivity()).addRecording(mRecording);
+        mCamera.setNowRecording(false);
+        updateUI();
+    }
+
+    @Override
+    public void onError(int videoCaptureError, @NonNull String message, @Nullable Throwable cause)
+    {
+        Log.e(Constants.appTag, message);
     }
 
     /*==================================================
@@ -104,11 +138,13 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
             mCamera.setNowRecording(!mCamera.isNowRecording());
             if (mCamera.isNowRecording())
             {
-                mCamera.record(getContext(), new Recording(CameraLab.get(getActivity()).getNumberOfRecordings()+1));
+                mRecording = new Recording(CameraLab.get(getActivity()).getNumberOfRecordings()+1);
+                mCamera.record(getContext(),this, mRecording);
+                updateUI();
             } else
             {
                 mCamera.stopRecording();
-            } updateUI();
+            }
         } else if (b.getId() == R.id.fileBtn)
         {
             startActivity(new Intent(getActivity(), RecordingListActivity.class));
@@ -117,10 +153,20 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
 
     private void updateUI()
     {
+        // Update elements
+        Bitmap thumbnail = PictureUtils.getScaledBitmap(CameraLab.get(getActivity())
+                .getThumbnailFile(mRecording).getPath(), getActivity());
+        if (thumbnail != null)
+        {
+            Log.d(Constants.appTag, "Potential Uh oh");
+            mFileBtn.setImageBitmap(thumbnail);
+            mFileBtn.setClipToOutline(true);
+        }
+
         // Toggle buttons
         mFileBtn.setEnabled(!mCamera.isNowRecording());
 
-        // Change layout elements
+        // Change layout elements by state
         if (mCamera.isNowRecording())
         {
             mCaptureBtn.setImageResource(R.drawable.ic_baseline_stop_66);
