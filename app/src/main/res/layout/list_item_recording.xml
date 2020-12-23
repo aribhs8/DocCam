@@ -29,7 +29,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/share_recording"
+                android:layout_toStartOf="@id/preview_bitmap"
                 android:orientation="vertical">
 
                 <TextView
@@ -60,22 +60,13 @@
 
             </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/share_recording"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toStartOf="@id/previewBitmap"
-                android:layout_marginEnd="25dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_baseline_share_24"
-                android:contentDescription="@string/share_description" />
-
-            <!-- This is a temporary image that needs to be changed once bitmap implemented -->
             <ImageView
-                android:id="@+id/previewBitmap"
-                android:layout_width="76dp"
-                android:layout_height="76dp"
-                android:src="@drawable/ic_baseline_source_24"
+                android:id="@+id/preview_bitmap"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:scaleType="fitXY"
+                android:loadImage="@{viewModel.thumbnail}"
+                android:background="@drawable/rounded_edges_image"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:contentDescription="@string/recording_title"/>

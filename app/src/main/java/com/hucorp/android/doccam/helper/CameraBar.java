@@ -56,8 +56,8 @@ public class CameraBar extends Toolbar implements View.OnClickListener, TimerToo
     public void updateDuration()
     {
         ((TextView) mLayout.findViewById(R.id.stopwatch)).setText(R.string.recording_duration);
-        Timer.setToolbarCallback(this);
-        Timer.runHalfSecondTimer();
+        //Timer.setToolbarCallback(this);
+        //Timer.runHalfSecondTimer();
     }
 
     @Override

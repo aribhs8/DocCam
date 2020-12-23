@@ -1,13 +1,23 @@
 package com.hucorp.android.doccam.models;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.widget.ImageView;
 
 import androidx.core.content.FileProvider;
 import androidx.databinding.BaseObservable;
 import androidx.databinding.Bindable;
+import androidx.databinding.BindingAdapter;
 
+import com.hucorp.android.doccam.R;
+import com.hucorp.android.doccam.helper.Camera;
 import com.hucorp.android.doccam.helper.CameraLab;
+import com.hucorp.android.doccam.helper.PictureUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -54,6 +64,19 @@ public class RecordingViewModel extends BaseObservable
         SimpleDateFormat formatter = new SimpleDateFormat("hh:mm:ss", Locale.CANADA);
         return formatter.format(mRecording.getDate());
     }
+
+    public Bitmap getThumbnail()
+    {
+        return PictureUtils.getScaledBitmap(CameraLab.get(mContext).getThumbnailFile(mRecording).getPath(), (Activity) mContext);
+    }
+
+    @BindingAdapter("android:loadImage")
+    public static void loadImage(ImageView imageView, Bitmap bitmapImage)
+    {
+        imageView.setImageBitmap(bitmapImage);
+        imageView.setClipToOutline(true);
+    }
+
 
     @Bindable
     public String getDuration()

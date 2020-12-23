@@ -1,7 +1,11 @@
 package com.hucorp.android.doccam.helper;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -20,6 +24,10 @@ import com.hucorp.android.doccam.Constants;
 import com.hucorp.android.doccam.models.Recording;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.concurrent.ExecutionException;
 
 public class Camera
@@ -87,10 +95,12 @@ public class Camera
         mNowRecording = nowRecording;
     }
 
+
     @SuppressLint("RestrictedApi")
     public void record(Context context, Recording recording)
     {
         File recordingFile = CameraLab.get(context).getRecordingFile(recording);
+        File thumbnailFile = CameraLab.get(context).getThumbnailFile(recording);
         VideoCapture.OutputFileOptions outputFileOptions = new VideoCapture.OutputFileOptions.Builder(recordingFile).build();
 
         mVideoCapture.startRecording(outputFileOptions, ContextCompat.getMainExecutor(context), new VideoCapture.OnVideoSavedCallback()
@@ -98,10 +108,23 @@ public class Camera
             @Override
             public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults)
             {
-                recording.setDuration(Timer.getTimeElapsed());
+                //recording.setDuration(Timer.getTimeElapsed());
+                Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(recordingFile.toString(), MediaStore.Images.Thumbnails.MINI_KIND);
+                try
+                {
+                    OutputStream fout = new FileOutputStream(thumbnailFile);
+                    thumbnail.compress(Bitmap.CompressFormat.JPEG, 85, fout);
+                    fout.close();
+                    MediaStore.Images.Media.insertImage(context.getContentResolver(), thumbnailFile.getAbsolutePath(), thumbnailFile.getName(), thumbnailFile.getName());
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+
                 CameraLab.get(context).addRecording(recording);
+
                 setNowRecording(false);
-                Timer.resetTimer();
+                //Timer.resetTimer();
             }
 
             @Override
@@ -110,6 +133,15 @@ public class Camera
                 Log.e(Constants.appTag, message);
             }
         });
+    }
+
+    @SuppressLint("RestrictedApi")
+    public void record(Context context, VideoCapture.OnVideoSavedCallback callback, Recording recording)
+    {
+        File recordingFile = CameraLab.get(context).getRecordingFile(recording);
+        VideoCapture.OutputFileOptions outputFileOptions = new VideoCapture.OutputFileOptions.Builder(recordingFile).build();
+
+        mVideoCapture.startRecording(outputFileOptions, ContextCompat.getMainExecutor(context), callback);
     }
 
     @SuppressLint("RestrictedApi")
