@@ -82,7 +82,10 @@ public class CameraLab
         return getRecordings().size();
     }
 
-    public Recording getLastRecording() { return getRecordings().get(getRecordings().size() - 1); }
+    public Recording getLastRecording()
+    {
+        return getRecordings().get(getRecordings().size() - 1);
+    }
 
     public void updateRecording(Recording recording)
     {
@@ -90,6 +93,15 @@ public class CameraLab
         ContentValues values = getContentValues(recording);
 
         mDatabase.update(RecordingTable.NAME, values,
+                RecordingTable.Cols.UUID + " = ?",
+                new String[] { uuidString });
+    }
+
+    public void deleteRecording(Recording recording)
+    {
+        String uuidString = recording.getID().toString();
+
+        mDatabase.delete(RecordingTable.NAME,
                 RecordingTable.Cols.UUID + " = ?",
                 new String[] { uuidString });
     }

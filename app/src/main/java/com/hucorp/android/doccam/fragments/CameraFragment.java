@@ -101,9 +101,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
         mToolbar.setCallback(this);
         initCamera();
 
-        mFileBtn.setImageBitmap(PictureUtils.getScaledBitmap(CameraLab.get(getActivity())
-                .getThumbnailFile(mRecording).getPath(), getActivity()));
-        mFileBtn.setClipToOutline(true);
+        if (mRecording != null)
+        {
+            mFileBtn.setImageBitmap(PictureUtils.getScaledBitmap(CameraLab.get(getActivity())
+                    .getThumbnailFile(mRecording).getPath(), getActivity()));
+            mFileBtn.setClipToOutline(true);
+        }
 
         mCaptureBtn.setOnClickListener(this);
         mFileBtn.setOnClickListener(this);
@@ -158,7 +161,6 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
                 .getThumbnailFile(mRecording).getPath(), getActivity());
         if (thumbnail != null)
         {
-            Log.d(Constants.appTag, "Potential Uh oh");
             mFileBtn.setImageBitmap(thumbnail);
             mFileBtn.setClipToOutline(true);
         }

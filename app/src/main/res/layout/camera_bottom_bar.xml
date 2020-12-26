@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Todo: Fix button press for images to support API level 21 -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/camera_bottom_bar"
@@ -11,6 +12,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@drawable/rounded_edges_button"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/left_camera_button"
         android:scaleType="fitXY"
         app:srcCompat="@drawable/ic_baseline_image_24"
