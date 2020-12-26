@@ -44,7 +44,6 @@ import static java.util.Objects.requireNonNull;
 
 /*
 Todo: Add deleting animation when recording is removed
-Todo: Delete video and image on app storage
 Todo: Change *nonnull* code (bad practice imo)
 Todo: Change appbar depending on how many items selected (hide edit button if > 1)
 Todo: Add dialog warning about how many items are to be deleted
