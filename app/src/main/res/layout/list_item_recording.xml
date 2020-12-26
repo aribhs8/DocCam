@@ -10,14 +10,17 @@
     </data>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/recording_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:onClick="@{(view) -> viewModel.onClick()}"
+        android:onClick="@{(view) -> viewModel.onClick(view)}"
+        app:onLongClickListener="@{(view) -> viewModel.onLongClick(view)}"
         app:cardElevation="5dp"
         android:foreground="?android:attr/selectableItemBackground"
         android:focusable="true"
         android:clickable="true"
+        android:longClickable="true"
         app:cardCornerRadius="10dp">
 
         <RelativeLayout
