@@ -21,14 +21,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DocCam">
         <activity android:name=".activities.TermsConditionsActivity"
-            android:parentActivityName=".activities.SettingsActivity"/>
+            android:parentActivityName=".activities.SettingsActivity" />
         <activity
             android:name=".activities.PrivacyPolicyActivity"
             android:parentActivityName=".activities.SettingsActivity" />
         <activity
             android:name=".activities.SettingsActivity"
             android:parentActivityName=".activities.CameraActivity"
-            android:theme="@style/Theme.DocCam"/>
+            android:theme="@style/Theme.DocCam.Settings"/>
         <activity
             android:name=".activities.CameraActivity"
             android:theme="@style/Theme.DocCam.Camera">
@@ -40,7 +40,8 @@
         </activity>
         <activity
             android:name=".activities.RecordingListActivity"
-            android:parentActivityName=".activities.CameraActivity" />
+            android:parentActivityName=".activities.CameraActivity"
+            android:theme="@style/Theme.DocCam.Recordings"/>
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.hucorp.android.doccam.fileprovider"
