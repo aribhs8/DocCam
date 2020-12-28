@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;

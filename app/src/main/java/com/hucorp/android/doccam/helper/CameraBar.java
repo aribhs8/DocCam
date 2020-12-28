@@ -2,6 +2,7 @@ package com.hucorp.android.doccam.helper;
 
 import android.content.Context;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -14,10 +15,15 @@ import com.hucorp.android.doccam.interfaces.TimerToolbarCallbacks;
 
 public class CameraBar extends Toolbar implements View.OnClickListener, TimerToolbarCallbacks
 {
+    //Timer
+    private boolean mDisplayTimerOptions = false;
+
     private CameraBarCallbacks mCallbacks;
 
     // Control layout elements
     private View mLayout;
+    private Button mFiveTimerBtn;
+    private Button mTenTimerBtn;
 
     public static CameraBar newInstance(Context context)
     {
@@ -38,7 +44,10 @@ public class CameraBar extends Toolbar implements View.OnClickListener, TimerToo
     {
         if (mLayout != null) mLayout.setVisibility(View.GONE);
         mLayout = layout;
+
         mLayout.setVisibility(View.VISIBLE);
+        mFiveTimerBtn = (Button) mLayout.findViewById(R.id.fivetimer);
+        mTenTimerBtn = (Button) mLayout.findViewById(R.id.tentimer);
         this.setListeners();
     }
 
@@ -49,6 +58,11 @@ public class CameraBar extends Toolbar implements View.OnClickListener, TimerToo
             if (mLayout.getId() == R.id.default_camera_toolbar)
             {
                 ((ImageButton) mLayout.findViewById(R.id.action_settings)).setOnClickListener(this);
+
+                //Countdown timer
+                ((ImageButton) mLayout.findViewById(R.id.action_timer)).setOnClickListener(this);
+                 mFiveTimerBtn.setOnClickListener(this);
+                 mTenTimerBtn.setOnClickListener(this);
             }
         }
     }
@@ -75,12 +89,22 @@ public class CameraBar extends Toolbar implements View.OnClickListener, TimerToo
     @Override
     public void onClick(View v)
     {
-        ImageButton b = (ImageButton) v;
         if (mCallbacks != null)
         {
-            if (b.getId() == R.id.action_settings)
+            if (v.getId() == R.id.action_settings)
             {
                 mCallbacks.onSettingsClick();
+            } else if (v.getId() == R.id.action_timer)
+            {
+                mDisplayTimerOptions = !mDisplayTimerOptions;
+                mFiveTimerBtn.setVisibility(mDisplayTimerOptions ? View.VISIBLE : View.GONE);
+                mTenTimerBtn.setVisibility(mDisplayTimerOptions ? View.VISIBLE : View.GONE);
+            } else if (v.getId() == R.id.fivetimer)
+            {
+
+            } else if (v.getId() == R.id.tentimer)
+            {
+
             }
         }
     }
