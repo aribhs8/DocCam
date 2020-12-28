@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import com.hucorp.android.doccam.database.RecordingBaseHelper;
 import com.hucorp.android.doccam.database.RecordingCursorWrapper;
@@ -47,14 +48,18 @@ public class CameraLab
         //return mRecordings;
         List<Recording> recordings = new ArrayList<>();
 
+
         try (RecordingCursorWrapper cursor = queryRecordings(null, null))
         {
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast())
-            {
-                recordings.add(cursor.getRecording());
-                cursor.moveToNext();
+            if(cursor.getCount() > 0){
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast())
+                {
+                    recordings.add(cursor.getRecording());
+                    cursor.moveToNext();
+                }
             }
+
         }
 
         return recordings;
@@ -84,7 +89,11 @@ public class CameraLab
 
     public Recording getLastRecording()
     {
-        return getRecordings().get(getRecordings().size() - 1);
+        if(getRecordings().size() == 0){
+            return null;
+        } else {
+            return getRecordings().get(getRecordings().size() - 1);
+        }
     }
 
     public void updateRecording(Recording recording)
