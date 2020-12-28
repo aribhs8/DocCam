@@ -48,14 +48,18 @@ public class CameraLab
         //return mRecordings;
         List<Recording> recordings = new ArrayList<>();
 
+
         try (RecordingCursorWrapper cursor = queryRecordings(null, null))
         {
-            cursor.moveToFirst();
-            while (!cursor.isAfterLast())
-            {
-                recordings.add(cursor.getRecording());
-                cursor.moveToNext();
+            if(cursor.getCount() > 0){
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast())
+                {
+                    recordings.add(cursor.getRecording());
+                    cursor.moveToNext();
+                }
             }
+
         }
 
         return recordings;
