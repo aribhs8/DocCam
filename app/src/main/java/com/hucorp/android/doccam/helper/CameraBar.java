@@ -16,15 +16,14 @@ import com.hucorp.android.doccam.interfaces.TimerToolbarCallbacks;
 public class CameraBar extends Toolbar implements View.OnClickListener, TimerToolbarCallbacks
 {
     //Timer
-    boolean timeroptions = true;
-    boolean fivetimeron;
-    boolean tentimeron;
-    private Button mFiveTimerBtn;
+    private boolean mDisplayTimerOptions = false;
 
     private CameraBarCallbacks mCallbacks;
 
     // Control layout elements
     private View mLayout;
+    private Button mFiveTimerBtn;
+    private Button mTenTimerBtn;
 
     public static CameraBar newInstance(Context context)
     {
@@ -45,15 +44,11 @@ public class CameraBar extends Toolbar implements View.OnClickListener, TimerToo
     {
         if (mLayout != null) mLayout.setVisibility(View.GONE);
         mLayout = layout;
-        mFiveTimerBtn = (Button) mLayout.findViewById(R.id.fivetimer);
 
         mLayout.setVisibility(View.VISIBLE);
+        mFiveTimerBtn = (Button) mLayout.findViewById(R.id.fivetimer);
+        mTenTimerBtn = (Button) mLayout.findViewById(R.id.tentimer);
         this.setListeners();
-
-        //Countdown
-        ((Button) mLayout.findViewById(R.id.fivetimer)).setVisibility(View.GONE);
-        ((Button) mLayout.findViewById(R.id.tentimer)).setVisibility(View.GONE);
-
     }
 
     private void setListeners()
@@ -66,8 +61,8 @@ public class CameraBar extends Toolbar implements View.OnClickListener, TimerToo
 
                 //Countdown timer
                 ((ImageButton) mLayout.findViewById(R.id.action_timer)).setOnClickListener(this);
-                ((Button) mLayout.findViewById(R.id.fivetimer)).setOnClickListener(this);
-                ((Button) mLayout.findViewById(R.id.tentimer)).setOnClickListener(this);
+                 mFiveTimerBtn.setOnClickListener(this);
+                 mTenTimerBtn.setOnClickListener(this);
             }
         }
     }
@@ -94,29 +89,22 @@ public class CameraBar extends Toolbar implements View.OnClickListener, TimerToo
     @Override
     public void onClick(View v)
     {
-        ImageButton b = (ImageButton) v;
-        //Button t = (Button) v;
-
         if (mCallbacks != null)
         {
-            if (b.getId() == R.id.action_settings)
+            if (v.getId() == R.id.action_settings)
             {
                 mCallbacks.onSettingsClick();
-            }
-
-            else if (b.getId() == R.id.action_timer)
+            } else if (v.getId() == R.id.action_timer)
             {
-                if (timeroptions){
-                    ((Button) mLayout.findViewById(R.id.fivetimer)).setVisibility(View.VISIBLE);
-                    ((Button) mLayout.findViewById(R.id.tentimer)).setVisibility(View.VISIBLE);
-                    timeroptions = false;
-                }
+                mDisplayTimerOptions = !mDisplayTimerOptions;
+                mFiveTimerBtn.setVisibility(mDisplayTimerOptions ? View.VISIBLE : View.GONE);
+                mTenTimerBtn.setVisibility(mDisplayTimerOptions ? View.VISIBLE : View.GONE);
+            } else if (v.getId() == R.id.fivetimer)
+            {
 
-                else {
-                    ((Button) mLayout.findViewById(R.id.fivetimer)).setVisibility(View.GONE);
-                    ((Button) mLayout.findViewById(R.id.tentimer)).setVisibility(View.GONE);
-                    timeroptions = true;
-                }
+            } else if (v.getId() == R.id.tentimer)
+            {
+
             }
         }
     }

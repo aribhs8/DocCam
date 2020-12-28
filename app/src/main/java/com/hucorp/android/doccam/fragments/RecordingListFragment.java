@@ -44,7 +44,6 @@ import static java.util.Objects.requireNonNull;
 
 /*
 Todo: Add deleting animation when recording is removed
-Todo: Change *nonnull* code (bad practice imo)
 Todo: Change appbar depending on how many items selected (hide edit button if > 1)
 Todo: Add dialog warning about how many items are to be deleted
 Todo: Undo video delete (future)
@@ -52,7 +51,6 @@ Todo: Prevent duplicate titles when editing (future)
  */
 public class RecordingListFragment extends Fragment
 {
-    private RecyclerView mRecordingList;
     private List<Recording> mRecordings;
 
     public static RecordingListFragment newInstance()
@@ -121,7 +119,6 @@ public class RecordingListFragment extends Fragment
         private List<Recording> mMultiSelectList;
         private PrimaryActionModeCallback mPrimaryActionModeCallback;
         private Context mContext;
-        private View mView;
 
         public RecordingAdapter(List<Recording> recordings)
         {
@@ -129,7 +126,6 @@ public class RecordingListFragment extends Fragment
             mMultiSelectList = new ArrayList<>();
             mPrimaryActionModeCallback = new PrimaryActionModeCallback(mMultiSelectList, this);
             mContext = getContext();
-            mView = getView();
         }
 
         @NonNull
@@ -205,7 +201,6 @@ public class RecordingListFragment extends Fragment
 
             if (item.getItemId() == R.id.action_delete)
             {
-                FileProvider fileProvider = new FileProvider();
                 for (Recording recording : mMultiSelectList)
                 {
                     Uri thumbnailUri = FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider",
@@ -213,12 +208,12 @@ public class RecordingListFragment extends Fragment
                     Uri recordingUri = FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider",
                             lab.getRecordingFile(recording));
 
-                    fileProvider.delete(recordingUri, null, null);
-                    fileProvider.delete(thumbnailUri, null, null);
+                    mContext.getContentResolver().delete(recordingUri, null, null);
+                    mContext.getContentResolver().delete(thumbnailUri, null, null);
                     lab.deleteRecording(recording);
                 }
                 setRecordings(lab.getRecordings());
-                Snackbar.make(mView, mMultiSelectList.size() + " recording(s) deleted", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getView(), mMultiSelectList.size() + " recording(s) deleted", Snackbar.LENGTH_SHORT).show();
             }
 
             mMultiSelectList.clear();
