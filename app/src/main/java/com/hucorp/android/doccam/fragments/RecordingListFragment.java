@@ -11,6 +11,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -211,6 +213,7 @@ public class RecordingListFragment extends Fragment
                     mContext.getContentResolver().delete(recordingUri, null, null);
                     mContext.getContentResolver().delete(thumbnailUri, null, null);
                     lab.deleteRecording(recording);
+
                 }
                 setRecordings(lab.getRecordings());
                 Snackbar.make(getView(), mMultiSelectList.size() + " recording(s) deleted", Snackbar.LENGTH_SHORT).show();
