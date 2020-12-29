@@ -8,12 +8,17 @@ import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -47,6 +52,15 @@ import static java.util.Objects.*;
 
 public class CameraFragment extends Fragment implements View.OnClickListener, CameraBarCallbacks, VideoCapture.OnVideoSavedCallback
 {
+
+    //Timer
+    int countdowndisplay = 5;
+    TextView timebuttondisplay;
+    ProgressBar timerBar;
+    CountDownTimer countdown;
+    ImageButton cancelTimer;
+    public static boolean startedTimer;
+
     // Layout elements
     private CameraBar mToolbar;
     private ImageButton mCaptureBtn;
@@ -95,6 +109,15 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
     {
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
 
+        timebuttondisplay = (TextView) v.findViewById(R.id.timebuttondisplay);
+        timebuttondisplay.setVisibility(v.GONE);
+
+        timerBar = (ProgressBar) v.findViewById(R.id.timerBar);
+        timerBar.setVisibility(v.GONE);
+
+        cancelTimer = (ImageButton) v.findViewById(R.id.cancelTimer);
+        cancelTimer.setVisibility(v.GONE);
+
         mCaptureBtn = (ImageButton) v.findViewById(R.id.captureBtn);
         mFileBtn = (ImageButton) v.findViewById(R.id.fileBtn);
 
@@ -112,6 +135,8 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
 
         mCaptureBtn.setOnClickListener(this);
         mFileBtn.setOnClickListener(this);
+
+        cancelTimer.setOnClickListener(this);
 
         return v;
     }
@@ -145,9 +170,19 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
             mCamera.setNowRecording(!mCamera.isNowRecording());
             if (mCamera.isNowRecording())
             {
-                mRecording = new Recording(CameraLab.get(getActivity()).getNumberOfRecordings()+1);
-                mCamera.record(getContext(),this, mRecording);
-                updateUI();
+                if (CameraBar.fivetimer) {
+                    startTimer(5000,1000);
+                }
+
+                else if (CameraBar.tentimer){
+                    startTimer(10000,1000);
+                }
+
+                else{
+                    mRecording = new Recording(CameraLab.get(getActivity()).getNumberOfRecordings()+1);
+                    mCamera.record(getContext(),this, mRecording);
+                    updateUI();
+                }
             } else
             {
                 mCamera.stopRecording();
@@ -156,6 +191,13 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
         {
             startActivity(new Intent(getActivity(), RecordingListActivity.class));
         }
+        else if (startedTimer == true){
+            if (b.getId() == R.id.cancelTimer){
+                cancelTimer();
+            }
+        }
+
+
     }
 
     private void updateUI()
@@ -226,4 +268,51 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
             }
         }
     }
+
+    void startTimer(int time, int interval) {
+        mCaptureBtn.setEnabled(false);
+        mToolbar.setLayout((ConstraintLayout) requireNonNull(getView()).findViewById(R.id.default_camera_toolbar));
+        cancelTimer.setVisibility(View.VISIBLE);
+        timebuttondisplay.setVisibility(View.VISIBLE);
+        countdowndisplay = time == 5000 ? 5 : 10;
+        timerBar.setVisibility(View.VISIBLE);
+        startedTimer = true;
+
+        countdown = new CountDownTimer(time, interval) {
+
+            public void onTick(long millisUntilFinished) {
+
+                timebuttondisplay.setText(Integer.toString(countdowndisplay));
+                countdowndisplay--;
+            }
+
+            public void onFinish() {
+                mCaptureBtn.setEnabled(true);
+                startedTimer = false;
+                cancelTimer.setVisibility(View.GONE);
+                timebuttondisplay.setVisibility(View.GONE);
+                timerBar.setVisibility(View.GONE);
+                mRecording = new Recording(CameraLab.get(getActivity()).getNumberOfRecordings() + 1);
+                mCamera.record(getContext(), CameraFragment.this, mRecording);
+                updateUI();
+            }
+        };
+        countdown.start();
+        CameraBar.fivetimer = false;
+        CameraBar.tentimer = false;
+    }
+
+    //cancel timer
+    void cancelTimer() {
+        if(countdown!=null)
+            mCaptureBtn.setEnabled(true);
+            startedTimer = false;
+            cancelTimer.setVisibility(View.GONE);
+            timebuttondisplay.setVisibility(View.GONE);
+            timerBar.setVisibility(View.GONE);
+            countdown.cancel();
+            mCaptureBtn.performClick();
+    }
+
 }
+
