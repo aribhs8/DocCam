@@ -172,8 +172,8 @@ public class CameraBar extends Toolbar implements View.OnClickListener, TimerToo
 
                 mDisplayTimerOptions = !mDisplayTimerOptions;
 
-                mFiveTimerBtn.setVisibility(getRootView().GONE);
-                mTenTimerBtn.setVisibility(getRootView().GONE);
+                mFiveTimerBtn.setVisibility(View.GONE);
+                mTenTimerBtn.setVisibility(View.GONE);
 
                 if (tentimer) {
                     tentimer = false;
