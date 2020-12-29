@@ -1,6 +1,8 @@
 package com.hucorp.android.doccam.helper;
 
+import android.content.Context;
 import android.os.Handler;
+import android.widget.Toolbar;
 
 import com.hucorp.android.doccam.interfaces.TimerToolbarCallbacks;
 
@@ -8,52 +10,60 @@ import java.util.Locale;
 
 public class Timer
 {
-    private static int sSeconds;
-    private static String sTime;
-    private static final Handler sDurationHandler;
-    private static TimerToolbarCallbacks sCallbacks;
+    private static Timer sTimer;
+    private Context mContext;
 
-    static {
-        sSeconds = 0;
-        sTime = "00:00";
-        sDurationHandler = new Handler();
+    // Timer control
+    private Handler mDurationHandler;
+    private int mSeconds;
+    private String mTime;
+
+    public static Timer get(Context context)
+    {
+        if (sTimer == null)
+        {
+            sTimer = new Timer(context);
+        }
+        return sTimer;
     }
 
-    public static void setToolbarCallback(TimerToolbarCallbacks callbacks)
+    public Timer(Context context)
     {
-        sCallbacks = callbacks;
+        mContext = context.getApplicationContext();
+        mDurationHandler = new Handler();
+        mSeconds = 0;
     }
 
-    public static void runHalfSecondTimer()
+    public void durationStopWatch(TimerToolbarCallbacks callbacks)
     {
-        sDurationHandler.postDelayed(new Runnable()
+        mDurationHandler.postDelayed(new Runnable()
         {
             @Override
             public void run()
             {
-                sDurationHandler.postDelayed(this, 500);
-                sSeconds++;
-                if (sSeconds % 2 == 0)
+                mDurationHandler.postDelayed(this, 500);
+                mSeconds++;
+                if (mSeconds % 2 == 0)
                 {
-                    int minutes = (sSeconds/2 % 3600) / 60;
-                    int secs = sSeconds/2 % 60;
-                    sTime = String.format(Locale.getDefault(), "%02d:%02d", minutes, secs);
-                    if (sCallbacks != null) sCallbacks.updateDurationText();
+                    int hours = (mSeconds/2) / 3600;
+                    int minutes = (mSeconds/2 % 3600) / 60;
+                    int seconds = (mSeconds/2) % 60;
+                    mTime = String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds);
+                    callbacks.updateDurationText();
                 }
-                if (sCallbacks != null) sCallbacks.updateIndicator(sSeconds);
+                callbacks.updateIndicator(mSeconds);
             }
         }, 500);
     }
 
-    public static String getTimeElapsed()
+    public String getTimeElapsed()
     {
-        return sTime;
+        return mTime;
     }
 
-    public static void resetTimer()
+    public void resetTimer()
     {
-        sSeconds = 0;
-        sDurationHandler.removeCallbacksAndMessages(null);
+        mSeconds = 0;
+        mDurationHandler.removeCallbacksAndMessages(null);
     }
-
 }

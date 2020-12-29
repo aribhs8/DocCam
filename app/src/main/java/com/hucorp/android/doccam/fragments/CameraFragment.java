@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.hucorp.android.doccam.helper.PictureUtils;
+import com.hucorp.android.doccam.helper.Timer;
 import com.hucorp.android.doccam.interfaces.CameraBarCallbacks;
 import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
@@ -118,9 +119,11 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
     @Override
     public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults)
     {
+        mRecording.setDuration(Timer.get(getActivity()).getTimeElapsed());
         CameraLab.get(getActivity()).saveThumbnailFromVideo(mRecording);        // Create & save thumbnail
         CameraLab.get(getActivity()).addRecording(mRecording);
         mCamera.setNowRecording(false);
+        Timer.get(getContext()).resetTimer();
         updateUI();
     }
 
