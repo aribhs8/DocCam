@@ -1,6 +1,7 @@
 package com.hucorp.android.doccam.fragments;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -222,6 +223,11 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
     public void onSettingsClick()
     {
         startActivity(new Intent(getActivity(), SettingsActivity.class));
+    }
+
+    @Override
+    public void onFlashClick() {
+        mCamera.flashLightOn(getContext());
     }
 
     /*==================================================

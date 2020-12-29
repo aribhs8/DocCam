@@ -116,6 +116,10 @@ public class CameraBar extends Toolbar implements View.OnClickListener, TimerToo
     {
         if (mCallbacks != null)
         {
+            if (v.getId() == R.id.action_flash){
+                mCallbacks.onFlashClick();
+            }
+
             if (v.getId() == R.id.action_settings && !CameraFragment.startedTimer)
             {
                 mCallbacks.onSettingsClick();

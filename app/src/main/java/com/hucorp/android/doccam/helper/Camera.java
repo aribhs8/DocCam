@@ -4,7 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.media.ThumbnailUtils;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
@@ -148,4 +151,19 @@ public class Camera
     {
         mVideoCapture.stopRecording();
     }
+
+
+    public void flashLightOn(Context context) {
+        CameraManager cameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+
+        try {
+            String cameraId = cameraManager.getCameraIdList()[0];
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                cameraManager.setTorchMode(cameraId, true);
+            }
+        } catch (CameraAccessException e) {
+        }
+    }
+
+
 }
