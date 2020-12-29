@@ -108,7 +108,7 @@ public class Camera
             @Override
             public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults)
             {
-                //recording.setDuration(Timer.getTimeElapsed());
+                recording.setDuration(Timer.get(context).getTimeElapsed());
                 Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(recordingFile.toString(), MediaStore.Images.Thumbnails.MINI_KIND);
                 try
                 {
@@ -122,9 +122,8 @@ public class Camera
                 }
 
                 CameraLab.get(context).addRecording(recording);
-
                 setNowRecording(false);
-                //Timer.resetTimer();
+                Timer.get(context).resetTimer();
             }
 
             @Override

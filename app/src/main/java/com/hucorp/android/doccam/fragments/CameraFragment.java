@@ -1,19 +1,18 @@
 package com.hucorp.android.doccam.fragments;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.hucorp.android.doccam.helper.PictureUtils;
+import com.hucorp.android.doccam.helper.Timer;
 import com.hucorp.android.doccam.interfaces.CameraBarCallbacks;
 import com.hucorp.android.doccam.activities.RecordingListActivity;
 import com.hucorp.android.doccam.activities.SettingsActivity;
@@ -35,10 +35,7 @@ import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.helper.CameraLab;
 import com.hucorp.android.doccam.models.Recording;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -46,6 +43,15 @@ import static java.util.Objects.*;
 
 public class CameraFragment extends Fragment implements View.OnClickListener, CameraBarCallbacks, VideoCapture.OnVideoSavedCallback
 {
+
+    //Timer
+    int countDownDisplay = 5;
+    TextView timeButtonDisplay;
+    ProgressBar timerBar;
+    CountDownTimer countdown;
+    ImageButton cancelTimer;
+    public static boolean startedTimer;
+
     // Layout elements
     private CameraBar mToolbar;
     private ImageButton mCaptureBtn;
@@ -94,6 +100,15 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
     {
         View v = inflater.inflate(R.layout.fragment_camera, container, false);
 
+        timeButtonDisplay = (TextView) v.findViewById(R.id.timebuttondisplay);
+        timeButtonDisplay.setVisibility(View.GONE);
+
+        timerBar = (ProgressBar) v.findViewById(R.id.timerBar);
+        timerBar.setVisibility(View.GONE);
+
+        cancelTimer = (ImageButton) v.findViewById(R.id.cancelTimer);
+        cancelTimer.setVisibility(View.GONE);
+
         mCaptureBtn = (ImageButton) v.findViewById(R.id.captureBtn);
         mFileBtn = (ImageButton) v.findViewById(R.id.fileBtn);
 
@@ -112,15 +127,19 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
         mCaptureBtn.setOnClickListener(this);
         mFileBtn.setOnClickListener(this);
 
+        cancelTimer.setOnClickListener(this);
+
         return v;
     }
 
     @Override
     public void onVideoSaved(@NonNull VideoCapture.OutputFileResults outputFileResults)
     {
+        mRecording.setDuration(Timer.get(getActivity()).getTimeElapsed());
         CameraLab.get(getActivity()).saveThumbnailFromVideo(mRecording);        // Create & save thumbnail
         CameraLab.get(getActivity()).addRecording(mRecording);
         mCamera.setNowRecording(false);
+        Timer.get(getContext()).resetTimer();
         updateUI();
     }
 
@@ -142,9 +161,19 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
             mCamera.setNowRecording(!mCamera.isNowRecording());
             if (mCamera.isNowRecording())
             {
-                mRecording = new Recording(CameraLab.get(getActivity()).getNumberOfRecordings()+1);
-                mCamera.record(getContext(),this, mRecording);
-                updateUI();
+                if (CameraBar.fivetimer) {
+                    startTimer(5000,1000);
+                }
+
+                else if (CameraBar.tentimer){
+                    startTimer(10000,1000);
+                }
+
+                else{
+                    mRecording = new Recording(CameraLab.get(getActivity()).getNumberOfRecordings()+1);
+                    mCamera.record(getContext(),this, mRecording);
+                    updateUI();
+                }
             } else
             {
                 mCamera.stopRecording();
@@ -153,6 +182,13 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
         {
             startActivity(new Intent(getActivity(), RecordingListActivity.class));
         }
+        else if (startedTimer){
+            if (b.getId() == R.id.cancelTimer){
+                cancelTimer();
+            }
+        }
+
+
     }
 
     private void updateUI()
@@ -223,4 +259,55 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
             }
         }
     }
+
+    /*==================================================
+     *                  TIMER CODE
+     * ==================================================*/
+
+    void startTimer(int time, int interval) {
+        mCaptureBtn.setEnabled(false);
+        mToolbar.setLayout((ConstraintLayout) requireNonNull(getView()).findViewById(R.id.default_camera_toolbar));
+        cancelTimer.setVisibility(View.VISIBLE);
+        timeButtonDisplay.setVisibility(View.VISIBLE);
+        countDownDisplay = time == 5000 ? 5 : 10;
+        timerBar.setVisibility(View.VISIBLE);
+        startedTimer = true;
+
+        countdown = new CountDownTimer(time, interval) {
+
+            public void onTick(long millisUntilFinished) {
+
+                timeButtonDisplay.setText(String.format(Locale.getDefault(), "%d", countDownDisplay));
+                countDownDisplay--;
+            }
+
+            public void onFinish() {
+                mCaptureBtn.setEnabled(true);
+                startedTimer = false;
+                cancelTimer.setVisibility(View.GONE);
+                timeButtonDisplay.setVisibility(View.GONE);
+                timerBar.setVisibility(View.GONE);
+                mRecording = new Recording(CameraLab.get(getActivity()).getNumberOfRecordings() + 1);
+                mCamera.record(getContext(), CameraFragment.this, mRecording);
+                updateUI();
+            }
+        };
+        countdown.start();
+        CameraBar.fivetimer = false;
+        CameraBar.tentimer = false;
+    }
+
+    //cancel timer
+    void cancelTimer() {
+        if(countdown!=null)
+            mCaptureBtn.setEnabled(true);
+            startedTimer = false;
+            cancelTimer.setVisibility(View.GONE);
+            timeButtonDisplay.setVisibility(View.GONE);
+            timerBar.setVisibility(View.GONE);
+            countdown.cancel();
+            mCaptureBtn.performClick();
+    }
+
 }
+
