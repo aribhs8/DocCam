@@ -6,8 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+
+import androidx.core.content.FileProvider;
 
 import com.hucorp.android.doccam.database.RecordingBaseHelper;
 import com.hucorp.android.doccam.database.RecordingCursorWrapper;
@@ -113,6 +116,18 @@ public class CameraLab
         mDatabase.delete(RecordingTable.NAME,
                 RecordingTable.Cols.UUID + " = ?",
                 new String[] { uuidString });
+    }
+
+    public void wipeRecordingData(Context context, Recording recording)
+    {
+        Uri thumbnailUri = FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider",
+                getThumbnailFile(recording));
+        Uri recordingUri = FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider",
+                getRecordingFile(recording));
+
+        context.getContentResolver().delete(recordingUri, null, null);
+        context.getContentResolver().delete(thumbnailUri, null, null);
+        deleteRecording(recording);
     }
 
     private RecordingCursorWrapper queryRecordings(String whereClause, String[] whereArgs)

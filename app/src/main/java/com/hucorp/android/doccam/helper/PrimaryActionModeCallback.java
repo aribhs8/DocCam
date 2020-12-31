@@ -20,6 +20,7 @@ public class PrimaryActionModeCallback implements ActionMode.Callback
 {
     private ActionMode mActionMode;
     private String mTitle;
+    private boolean mForceRefresh = true;
     @MenuRes private int mMenuResId = 0;
     private List<Recording> mMultiSelectList;
     private OnActionItemClickListener mCallback;
@@ -57,7 +58,6 @@ public class PrimaryActionModeCallback implements ActionMode.Callback
     public boolean onActionItemClicked(ActionMode mode, MenuItem item)
     {
         mCallback.onActionItemClick(item);
-        mActionMode.finish();
         return true;
     }
 
@@ -66,11 +66,19 @@ public class PrimaryActionModeCallback implements ActionMode.Callback
     {
         mActionMode = null;
         mMultiSelectList.clear();
-        mCallback.refresh();
+        if (mForceRefresh)
+            mCallback.updateUI();
+        mForceRefresh = true;
     }
 
     public void finishActionMode()
     {
+        mActionMode.finish();
+    }
+
+    public void forceClose()
+    {
+        mForceRefresh = false;
         mActionMode.finish();
     }
 
