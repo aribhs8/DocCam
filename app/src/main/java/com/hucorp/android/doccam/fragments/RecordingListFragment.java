@@ -10,11 +10,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
+import androidx.core.view.MenuItemCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -38,8 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecordingListFragment extends Fragment
-        implements RecyclerViewCallback, OnActionItemClickListener, DeleteDialogListener
-{
+        implements RecyclerViewCallback, OnActionItemClickListener, DeleteDialogListener, SearchView.OnQueryTextListener {
     private List<Recording> mRecordings;
     private List<Recording> mMultiSelectList;
 
@@ -73,7 +74,37 @@ public class RecordingListFragment extends Fragment
     {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_recording_list, menu);
+        MenuItem search = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) search.getActionView();
+        searchView.setQueryHint("Recording Name");
+        searchView.setOnQueryTextListener(this);
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query){
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText){
+        newText = newText.toLowerCase();
+        ArrayList<Recording> newList = new ArrayList<>();
+        for (Recording recording: mRecordings){
+            String name = recording.getTitle().toLowerCase();
+            if(name.contains(newText)){
+                newList.add(recording);
+            }
+        }
+        mAdapter.setFilter(newList);
+        return true;
+    }
+
+
 
     @Nullable
     @Override
@@ -145,6 +176,7 @@ public class RecordingListFragment extends Fragment
             assert getFragmentManager() != null;
             dialog.show(getFragmentManager(), "DeleteDialogFragment");
         }
+
     }
 
     @Override

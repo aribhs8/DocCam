@@ -36,6 +36,13 @@ public class RecordingAdapter extends RecyclerView.Adapter<RecordingAdapter.Reco
         mMultiSelectList = multiSelectList;
     }
 
+    public void setFilter(List<Recording> newList){
+        mRecordings = new ArrayList<>();
+        mRecordings.addAll(newList);
+        notifyDataSetChanged();
+    }
+
+
     @NonNull
     @Override
     public RecordingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
