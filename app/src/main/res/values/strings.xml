@@ -18,6 +18,15 @@
     <string name="timer">Timer</string>
     <string name="search">Search</string>
     <string name="delete">Delete</string>
+    <string name="delete_caps">DELETE</string>
+    <string name="cancel">CANCEL</string>
     <string name="edit">Edit</string>
     <string name="share">Share</string>
+    <string name="dialog_delete_title_plural">Delete recordings</string>
+    <string name="dialog_delete_title">Delete recording</string>
+    <string name="dialog_delete_message_plural">Are you sure you want to permanently delete the selected recordings?</string>
+    <string name="dialog_delete_message">Are you sure you want to permanently delete the selected recording?</string>
+    <string name="no_recordings_title">Well this sucks…</string>
+    <string name="no_recordings_message">It appears that you don\'t have any recordings saved. Go back and make a video!</string>
+    <string name="no_recordings_description">No recordings found</string>
 </resources>

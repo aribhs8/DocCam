@@ -4,70 +4,68 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.FileProvider;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.hucorp.android.doccam.Constants;
-import com.hucorp.android.doccam.helper.Camera;
-import com.hucorp.android.doccam.helper.CameraLab;
 import com.hucorp.android.doccam.R;
+import com.hucorp.android.doccam.databinding.FragmentRecordingListBinding;
+import com.hucorp.android.doccam.fragments.recyclerview.CustomItemAnimator;
+import com.hucorp.android.doccam.fragments.recyclerview.RecordingAdapter;
+import com.hucorp.android.doccam.helper.CameraLab;
 import com.hucorp.android.doccam.helper.PrimaryActionModeCallback;
+import com.hucorp.android.doccam.interfaces.DeleteDialogListener;
 import com.hucorp.android.doccam.interfaces.OnActionItemClickListener;
 import com.hucorp.android.doccam.interfaces.RecyclerViewCallback;
 import com.hucorp.android.doccam.models.Recording;
-import com.hucorp.android.doccam.models.RecordingViewModel;
-import com.hucorp.android.doccam.databinding.FragmentRecordingListBinding;
-import com.hucorp.android.doccam.databinding.ListItemRecordingBinding;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-import static java.util.Objects.requireNonNull;
-
-/*
-Todo: Add deleting animation when recording is removed
-Todo: Change appbar depending on how many items selected (hide edit button if > 1)
-Todo: Add dialog warning about how many items are to be deleted
-Todo: Undo video delete (future)
-Todo: Prevent duplicate titles when editing (future)
- */
 public class RecordingListFragment extends Fragment
+        implements RecyclerViewCallback, OnActionItemClickListener, DeleteDialogListener
 {
     private List<Recording> mRecordings;
+    private List<Recording> mMultiSelectList;
 
-    public static RecordingListFragment newInstance()
-    {
-        return new RecordingListFragment();
-    }
+    private FragmentRecordingListBinding mBinding;
+    private RecordingAdapter mAdapter;
+    private PrimaryActionModeCallback mActionMode;
+
+    private Context mContext;
+
+    public static RecordingListFragment newInstance() { return new RecordingListFragment(); }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        CameraLab cameraLab = CameraLab.get(getActivity());
-        mRecordings = cameraLab.getRecordings();
-        requireNonNull(getActivity()).setTitle("Recordings");
+        mRecordings = CameraLab.get(getActivity()).getRecordings();
+        mMultiSelectList = new ArrayList<>();
+        mActionMode = new PrimaryActionModeCallback(mMultiSelectList, this);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        updateLayout();
     }
 
     @Override
@@ -81,157 +79,102 @@ public class RecordingListFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
     {
-        if (mRecordings.size() != 0)
-        {
-        FragmentRecordingListBinding binding = DataBindingUtil
+        mBinding = DataBindingUtil
                 .inflate(inflater, R.layout.fragment_recording_list, container, false);
+        mContext = getContext();
 
-        binding.recordingsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        binding.recordingsRecyclerView.setAdapter(new RecordingAdapter(mRecordings));
+        mAdapter = new RecordingAdapter(mRecordings, this);
 
-        return binding.getRoot();}
+        mBinding.recordingsRecyclerView.setAdapter(mAdapter);
+        mBinding.recordingsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mBinding.recordingsRecyclerView.setHasFixedSize(true);
+        mBinding.recordingsRecyclerView.setItemAnimator(new CustomItemAnimator());
 
-        else{
-            View v = inflater.inflate(R.layout.fragment_no_recordings, container, false);
-            return v;
+        return mBinding.getRoot();
+    }
+
+    public void updateLayout()
+    {
+        if (mRecordings.size() == 0)
+        {
+            mBinding.noRecordings.setVisibility(View.VISIBLE);
+        } else
+        {
+            mBinding.noRecordings.setVisibility(View.GONE);
         }
     }
 
-    private class RecordingHolder extends RecyclerView.ViewHolder
+    @Override
+    public boolean isMultiSelect()
     {
-        private ListItemRecordingBinding mBinding;
+        return mMultiSelectList.size() > 0;
+    }
 
-        private RecordingHolder(ListItemRecordingBinding binding, RecyclerViewCallback callback)
+    @Override
+    public void multi_select(Recording recording)
+    {
+        if (mActionMode.getActionMode() == null)
+            mActionMode.startActionMode(mBinding.getRoot(), R.menu.fragment_recording_list_context_menu, "1");
+
+        if (mMultiSelectList.contains(recording))
         {
-            super(binding.getRoot());
-            mBinding = binding;
-            mBinding.setViewModel(new RecordingViewModel(getContext(), callback));
+            mMultiSelectList.remove(recording);
+        } else
+        {
+            mMultiSelectList.add(recording);
         }
 
-        public void bind(Recording recording)
+        if (mMultiSelectList.size() > 0)
         {
-            mBinding.getViewModel().setRecording(recording);
-            mBinding.executePendingBindings();
+            mActionMode.getActionMode().setTitle("" + mMultiSelectList.size());
+        } else
+        {
+            mActionMode.getActionMode().setTitle("");
+            mActionMode.finishActionMode();
+        }
+
+        updateUI();
+    }
+
+    @Override
+    public void onActionItemClick(MenuItem item)
+    {
+        if (item.getItemId() == R.id.action_delete)
+        {
+            DeleteDialogFragment dialog = DeleteDialogFragment.newInstance(mMultiSelectList.size() > 1, this);
+            assert getFragmentManager() != null;
+            dialog.show(getFragmentManager(), "DeleteDialogFragment");
         }
     }
 
-    public class RecordingAdapter extends RecyclerView.Adapter<RecordingHolder> implements RecyclerViewCallback, OnActionItemClickListener
+    @Override
+    public void updateUI()
     {
-        private List<Recording> mRecordings;
-        private List<Recording> mMultiSelectList;
-        private PrimaryActionModeCallback mPrimaryActionModeCallback;
-        private Context mContext;
+        mAdapter.setMultiSelectList(mMultiSelectList);
+        mAdapter.notifyDataSetChanged();
+    }
 
-        public RecordingAdapter(List<Recording> recordings)
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialogFragment)
+    {
+        for (Recording recording : mMultiSelectList)
         {
-            mRecordings = recordings;
-            mMultiSelectList = new ArrayList<>();
-            mPrimaryActionModeCallback = new PrimaryActionModeCallback(mMultiSelectList, this);
-            mContext = getContext();
+            int position = mRecordings.indexOf(recording);
+            mRecordings.remove(position);
+            mAdapter.notifyItemRemoved(position);
+            CameraLab.get(getContext()).wipeRecordingData(mContext, recording);
         }
 
-        @NonNull
-        @Override
-        public RecordingHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType)
-        {
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-            ListItemRecordingBinding binding = DataBindingUtil
-                    .inflate(inflater, R.layout.list_item_recording, parent, false);
+        dialogFragment.dismiss();
+        updateLayout();
+        Snackbar.make(mBinding.getRoot(), mMultiSelectList.size() + " recording(s) were deleted", Snackbar.LENGTH_SHORT).show();
+        mActionMode.forceClose();
+    }
 
-            return new RecordingHolder(binding, this);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull RecordingHolder holder, int position)
-        {
-            Recording recording = mRecordings.get(position);
-            CardView cardView = (CardView) holder.itemView;
-            if (mMultiSelectList.contains(recording))
-            {
-                cardView.setCardBackgroundColor(getResources().getColor(R.color.light_sky_blue));
-            } else
-            {
-                cardView.setCardBackgroundColor(getResources().getColor(R.color.white));
-            }
-            holder.bind(recording);
-        }
-
-        @Override
-        public int getItemCount()
-        {
-            return mRecordings.size();
-        }
-
-        @Override
-        public boolean isMultiSelect()
-        {
-            return mMultiSelectList.size() > 0;
-        }
-
-        @Override
-        public void multi_select(Recording recording)
-        {
-            if (mPrimaryActionModeCallback.getActionMode() == null)
-            {
-                mPrimaryActionModeCallback.startActionMode(requireNonNull(getView()), R.menu.fragment_recording_list_context_menu, "1");
-            }
-
-            if (mMultiSelectList.contains(recording))
-            {
-                mMultiSelectList.remove(recording);
-            } else
-            {
-                mMultiSelectList.add(recording);
-            }
-
-            if (mMultiSelectList.size() > 0)
-            {
-                mPrimaryActionModeCallback.getActionMode().setTitle("" + mMultiSelectList.size());
-            } else
-            {
-                mPrimaryActionModeCallback.getActionMode().setTitle("");
-                mPrimaryActionModeCallback.finishActionMode();
-            }
-
-            refresh();
-        }
-
-        @Override
-        public void onActionItemClick(MenuItem item)
-        {
-            CameraLab lab = CameraLab.get(getActivity());
-
-            if (item.getItemId() == R.id.action_delete)
-            {
-                for (Recording recording : mMultiSelectList)
-                {
-                    Uri thumbnailUri = FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider",
-                            lab.getThumbnailFile(recording));
-                    Uri recordingUri = FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider",
-                            lab.getRecordingFile(recording));
-
-                    mContext.getContentResolver().delete(recordingUri, null, null);
-                    mContext.getContentResolver().delete(thumbnailUri, null, null);
-                    lab.deleteRecording(recording);
-
-                }
-                setRecordings(lab.getRecordings());
-                Snackbar.make(getView(), mMultiSelectList.size() + " recording(s) deleted", Snackbar.LENGTH_SHORT).show();
-            }
-
-            mMultiSelectList.clear();
-            refresh();
-        }
-
-        private void setRecordings(List<Recording> recordings)
-        {
-            mRecordings = recordings;
-        }
-
-        @Override
-        public void refresh()
-        {
-            notifyDataSetChanged();
-        }
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialogFragment)
+    {
+        dialogFragment.dismiss();
+        mActionMode.finishActionMode();
     }
 }
