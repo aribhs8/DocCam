@@ -11,4 +11,5 @@
     <color name="transparent">#00000000</color>
     <color name="red">#E60000</color>
     <color name="light_sky_blue">#CEEEFF</color>
+    <color name="dim_black">#99000000</color>
 </resources>

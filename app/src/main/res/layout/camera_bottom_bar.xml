@@ -62,11 +62,25 @@
         app:layout_constraintTop_toTopOf="@+id/timerBar" />
 
     <ImageButton
+        android:id="@+id/streamBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_live_streaming"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/captureBtn"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:contentDescription="@string/live_stream" />
+
+
+    <ImageButton
         android:id="@+id/cancelTimer"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:background="@android:color/transparent"
         android:scaleType="fitCenter"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.525"

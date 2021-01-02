@@ -56,6 +56,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
     private CameraBar mToolbar;
     private ImageButton mCaptureBtn;
     private ImageButton mFileBtn;
+    private ImageButton mStreamBtn;
 
     // Camera control
     private ExecutorService mCameraExecutor;
@@ -107,10 +108,10 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
         timerBar.setVisibility(View.GONE);
 
         cancelTimer = (ImageButton) v.findViewById(R.id.cancelTimer);
-        cancelTimer.setVisibility(View.GONE);
 
         mCaptureBtn = (ImageButton) v.findViewById(R.id.captureBtn);
         mFileBtn = (ImageButton) v.findViewById(R.id.fileBtn);
+        mStreamBtn = (ImageButton) v.findViewById(R.id.streamBtn);
 
         mCamera.defineSurface((PreviewView) v.findViewById(R.id.viewFinder));
         mToolbar.setLayout((ConstraintLayout) v.findViewById(R.id.default_camera_toolbar));
@@ -126,7 +127,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
 
         mCaptureBtn.setOnClickListener(this);
         mFileBtn.setOnClickListener(this);
-
+        mStreamBtn.setOnClickListener(this);
         cancelTimer.setOnClickListener(this);
 
         return v;
@@ -181,14 +182,16 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
         } else if (b.getId() == R.id.fileBtn)
         {
             startActivity(new Intent(getActivity(), RecordingListActivity.class));
-        }
-        else if (startedTimer){
+        } else if (b.getId() == R.id.streamBtn)
+        {
+            StreamingBottomSheetFragment fragment = StreamingBottomSheetFragment.newInstance();
+            fragment.show(getFragmentManager(), "StreamingBottomSheetFragment");
+        } else if (startedTimer)
+        {
             if (b.getId() == R.id.cancelTimer){
                 cancelTimer();
             }
         }
-
-
     }
 
     private void updateUI()
@@ -267,6 +270,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
     void startTimer(int time, int interval) {
         mCaptureBtn.setEnabled(false);
         mToolbar.setLayout((ConstraintLayout) requireNonNull(getView()).findViewById(R.id.default_camera_toolbar));
+        mStreamBtn.setVisibility(View.GONE);
         cancelTimer.setVisibility(View.VISIBLE);
         timeButtonDisplay.setVisibility(View.VISIBLE);
         countDownDisplay = time == 5000 ? 5 : 10;
@@ -284,6 +288,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
             public void onFinish() {
                 mCaptureBtn.setEnabled(true);
                 startedTimer = false;
+                mStreamBtn.setVisibility(View.VISIBLE);
                 cancelTimer.setVisibility(View.GONE);
                 timeButtonDisplay.setVisibility(View.GONE);
                 timerBar.setVisibility(View.GONE);
@@ -302,6 +307,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
         if(countdown!=null)
             mCaptureBtn.setEnabled(true);
             startedTimer = false;
+            mStreamBtn.setVisibility(View.VISIBLE);
             cancelTimer.setVisibility(View.GONE);
             timeButtonDisplay.setVisibility(View.GONE);
             timerBar.setVisibility(View.GONE);

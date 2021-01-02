@@ -29,4 +29,8 @@
     <string name="no_recordings_title">Well this sucks…</string>
     <string name="no_recordings_message">It appears that you don\'t have any recordings saved. Go back and make a video!</string>
     <string name="no_recordings_description">No recordings found</string>
+    <string name="live_stream">Live Streaming</string>
+    <string name="live_stream_sheet_body">Stream to any of the following services</string>
+    <string name="youtube">YouTube</string>
+    <string name="signed_in_text">Not Signed In</string>
 </resources>

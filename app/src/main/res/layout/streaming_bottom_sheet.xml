@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#ffffff"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/live_stream_logo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="@string/live_stream"
+            app:srcCompat="@drawable/ic_live_streaming" />
+
+        <LinearLayout
+            android:paddingHorizontal="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/live_stream"
+                android:textSize="20sp"
+                style="@style/titleText" />
+
+            <TextView
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="@string/live_stream_sheet_body"
+                style="@style/secondaryText.sheet" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/share_description"
+            app:srcCompat="@drawable/ic_baseline_share_24" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/youtube_stream"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/signed_in_text"
+        android:paddingVertical="8dp"
+        android:paddingStart="10dp"
+        style="@style/sheet_items"
+        app:drawableStartCompat="@drawable/ic_youtube" />
+
+    <TextView
+        android:id="@+id/twitch_stream"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/signed_in_text"
+        android:paddingVertical="8dp"
+        android:paddingStart="10dp"
+        style="@style/sheet_items"
+        app:drawableStartCompat="@drawable/ic_twitch" />
+
+</LinearLayout>
