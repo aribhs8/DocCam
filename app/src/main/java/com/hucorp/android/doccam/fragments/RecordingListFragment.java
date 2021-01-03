@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecordingListFragment extends Fragment
-        implements RecyclerViewCallback, OnActionItemClickListener, DeleteDialogListener, SearchView.OnQueryTextListener {
+        implements RecyclerViewCallback, OnActionItemClickListener, DeleteDialogListener,  SearchView.OnQueryTextListener, EditDialogFragment.EditDialogListener {
     private List<Recording> mRecordings;
     private List<Recording> mMultiSelectList;
 
@@ -164,6 +164,15 @@ public class RecordingListFragment extends Fragment
             mActionMode.finishActionMode();
         }
 
+        if(mMultiSelectList.size() > 1){
+            mActionMode.getActionMode().getMenu().findItem(R.id.action_edit).setVisible(false);
+
+        } else {
+            if(isMultiSelect()){
+                mActionMode.getActionMode().getMenu().findItem(R.id.action_edit).setVisible(true);
+            }
+
+        }
         updateUI();
     }
 
@@ -175,6 +184,9 @@ public class RecordingListFragment extends Fragment
             DeleteDialogFragment dialog = DeleteDialogFragment.newInstance(mMultiSelectList.size() > 1, this);
             assert getFragmentManager() != null;
             dialog.show(getFragmentManager(), "DeleteDialogFragment");
+        } else if(item.getItemId() == R.id.action_edit){
+            EditDialogFragment dialog = EditDialogFragment.newInstance(this);;
+            dialog.show(getFragmentManager(), "EditDialogFragment");
         }
 
     }
@@ -208,5 +220,11 @@ public class RecordingListFragment extends Fragment
     {
         dialogFragment.dismiss();
         mActionMode.finishActionMode();
+    }
+
+
+    @Override
+    public void updateRecording(String newTitle) {
+        Toast.makeText(mContext, "update", Toast.LENGTH_SHORT).show();
     }
 }
