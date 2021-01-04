@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RecordingListFragment extends Fragment
-        implements RecyclerViewCallback, OnActionItemClickListener, DeleteDialogListener, SearchView.OnQueryTextListener {
+        implements RecyclerViewCallback, OnActionItemClickListener, DeleteDialogListener,  SearchView.OnQueryTextListener, EditDialogFragment.EditDialogListener {
     private List<Recording> mRecordings;
     private List<Recording> mMultiSelectList;
 
@@ -105,7 +105,6 @@ public class RecordingListFragment extends Fragment
     }
 
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
@@ -164,6 +163,15 @@ public class RecordingListFragment extends Fragment
             mActionMode.finishActionMode();
         }
 
+        if(mMultiSelectList.size() > 1){
+            mActionMode.getActionMode().getMenu().findItem(R.id.action_edit).setVisible(false);
+
+        } else {
+            if(isMultiSelect()){
+                mActionMode.getActionMode().getMenu().findItem(R.id.action_edit).setVisible(true);
+            }
+
+        }
         updateUI();
     }
 
@@ -175,6 +183,11 @@ public class RecordingListFragment extends Fragment
             DeleteDialogFragment dialog = DeleteDialogFragment.newInstance(mMultiSelectList.size() > 1, this);
             assert getFragmentManager() != null;
             dialog.show(getFragmentManager(), "DeleteDialogFragment");
+        }
+        else if(item.getItemId() == R.id.action_edit){
+            String name = mMultiSelectList.get(0).getTitle();
+            EditDialogFragment dialog = EditDialogFragment.newInstance(name, this);;
+            dialog.show(getFragmentManager(), "EditDialogFragment");
         }
 
     }
@@ -207,6 +220,24 @@ public class RecordingListFragment extends Fragment
     public void onDialogNegativeClick(DialogFragment dialogFragment)
     {
         dialogFragment.dismiss();
+        mActionMode.finishActionMode();
+    }
+
+
+    @Override
+    public void updateRecording(EditDialogFragment dialog, String newTitle) {
+        Recording newRec = mMultiSelectList.get(0);
+        String oldTitle = newRec.getTitle();
+        if(oldTitle.equals(newTitle)){
+            dialog.dismiss();
+            mActionMode.finishActionMode();
+            return;
+        }
+        newRec.setTitle(newTitle);
+        CameraLab.get(getContext()).updateRecording(newRec);
+        mAdapter.notifyDataSetChanged();
+        dialog.dismiss();
+        Snackbar.make(mBinding.getRoot(), "Recording name was updated to " + "\""+newTitle+"\"", Snackbar.LENGTH_SHORT).show();
         mActionMode.finishActionMode();
     }
 }
