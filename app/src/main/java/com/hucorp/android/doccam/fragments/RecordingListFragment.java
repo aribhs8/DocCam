@@ -105,7 +105,6 @@ public class RecordingListFragment extends Fragment
     }
 
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
@@ -184,8 +183,10 @@ public class RecordingListFragment extends Fragment
             DeleteDialogFragment dialog = DeleteDialogFragment.newInstance(mMultiSelectList.size() > 1, this);
             assert getFragmentManager() != null;
             dialog.show(getFragmentManager(), "DeleteDialogFragment");
-        } else if(item.getItemId() == R.id.action_edit){
-            EditDialogFragment dialog = EditDialogFragment.newInstance(this);;
+        }
+        else if(item.getItemId() == R.id.action_edit){
+            String name = mMultiSelectList.get(0).getTitle();
+            EditDialogFragment dialog = EditDialogFragment.newInstance(name, this);;
             dialog.show(getFragmentManager(), "EditDialogFragment");
         }
 
@@ -224,7 +225,19 @@ public class RecordingListFragment extends Fragment
 
 
     @Override
-    public void updateRecording(String newTitle) {
-        Toast.makeText(mContext, "update", Toast.LENGTH_SHORT).show();
+    public void updateRecording(EditDialogFragment dialog, String newTitle) {
+        Recording newRec = mMultiSelectList.get(0);
+        String oldTitle = newRec.getTitle();
+        if(oldTitle.equals(newTitle)){
+            dialog.dismiss();
+            mActionMode.finishActionMode();
+            return;
+        }
+        newRec.setTitle(newTitle);
+        CameraLab.get(getContext()).updateRecording(newRec);
+        mAdapter.notifyDataSetChanged();
+        dialog.dismiss();
+        Snackbar.make(mBinding.getRoot(), "Recording name was updated to " + "\""+newTitle+"\"", Snackbar.LENGTH_SHORT).show();
+        mActionMode.finishActionMode();
     }
 }
