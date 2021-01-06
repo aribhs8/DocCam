@@ -1,208 +1,209 @@
-  package com.hucorp.android.doccam.fragments;
+package com.hucorp.android.doccam.fragments;
 
-import android.app.Activity;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-import android.transition.AutoTransition;
-import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
+import androidx.annotation.RestrictTo;
 import androidx.cardview.widget.CardView;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.youtube.YouTubeScopes;
+import com.hucorp.android.doccam.Constants;
 import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.activities.PrivacyPolicyActivity;
-import com.hucorp.android.doccam.activities.SettingsActivity;
 import com.hucorp.android.doccam.activities.TermsConditionsActivity;
+import com.hucorp.android.doccam.helper.CameraLab;
+import com.hucorp.android.doccam.interfaces.DeleteDialogListener;
 
+import java.util.Arrays;
+import java.util.Locale;
 import java.util.concurrent.Executor;
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends Fragment
+{
+    private TextView mNumberOfRecordingsText;
+    private CardView mDeleteAllRecordingsCard;
+    private CardView mPrivacyPolicyCard;
+    private CardView mTermsAndConditionsCard;
+    private TextView mUserName;
+    private Button mAccountBtn;
+    private ImageView mProfilePic;
+    private SwitchMaterial mUploadSwitch;
 
-    private static final int RC_SIGN_IN = 0 ;
+    // YouTube
+    GoogleAccountCredential mCredential;
+    private GoogleSignInClient mGoogleSignInClient;
+    private GoogleSignInAccount mGoogleSignInAccount;
+
+
     public static SettingsFragment newInstance()
     {
         return new SettingsFragment();
     }
 
-    private CardView gdrive, dropbx, onedrive, youtube, twitch;
-    private CardView gdrive_expand, dropbox_expand, onedrive_expand, youtube_expand, twitch_expand;
-    private ImageView drive_arrow, dropbox_arrow, onedrive_arrow, youtube_arrow, twitch_arrow;
-    private Button privacy_policy, terms_conditions, gdrive_authenticate;
-    private TextView gdrive_text, gdrive_name;
-    private String personName, personGivenName, personFamilyName, personEmail;
-
-    //Google sign in
-    GoogleSignInClient mGoogleSignInClient;
-
-    private SharedPreferences prefs;
-    private SharedPreferences.Editor editor;
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle("Settings");
-        prefs = getActivity().getSharedPreferences("Settings", Context.MODE_PRIVATE);
-        editor = prefs.edit();
 
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        // Configure sign-in to request the user's ID, email address, and basic profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        // Todo: access youtube account with this (does requestScope work for this?)
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
+                .requestProfile()
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
     }
 
-
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    {
         View v = inflater.inflate(R.layout.fragment_settings, container, false);
+        mNumberOfRecordingsText = (TextView) v.findViewById(R.id.number_of_recordings);
+        mDeleteAllRecordingsCard = (CardView) v.findViewById(R.id.delete_all_recordings);
+        mPrivacyPolicyCard = (CardView) v.findViewById(R.id.privacy_policy);
+        mTermsAndConditionsCard = (CardView) v.findViewById(R.id.terms_and_conditions);
+        mAccountBtn = (Button) v.findViewById(R.id.youtube_account_btn);
+        mUserName = (TextView) v.findViewById(R.id.youtube_name);
+        mProfilePic = (ImageView) v.findViewById(R.id.youtube_profile_pic);
+        mUploadSwitch = (SwitchMaterial) v.findViewById(R.id.upload_after_stream_switch);
 
-
-        gdrive = v.findViewById(R.id.gdrive);
-        dropbx = v.findViewById(R.id.dropbox);
-        onedrive = v.findViewById(R.id.onedrive);
-        youtube = v.findViewById(R.id.youtube);
-        twitch = v.findViewById(R.id.twitch);
-        gdrive_expand = v.findViewById(R.id.expand_gdrive);
-        dropbox_expand = v.findViewById(R.id.expand_dropbox);
-        onedrive_expand = v.findViewById(R.id.expand_onedrive);
-        youtube_expand = v.findViewById(R.id.expand_youtube);
-        twitch_expand = v.findViewById(R.id.expand_twitch);
-        drive_arrow = v.findViewById(R.id.gdrive_arrow);
-        dropbox_arrow = v.findViewById(R.id.dropbox_arrow);
-        onedrive_arrow = v.findViewById(R.id.onedrive_arrow);
-        youtube_arrow = v.findViewById(R.id.youtube_arrow);
-        twitch_arrow = v.findViewById(R.id.twitch_arrow);
-        privacy_policy = v.findViewById(R.id.privacy_policy);
-        terms_conditions = v.findViewById(R.id.term_conditions);
-        gdrive_authenticate = v.findViewById(R.id.gdrive_authenticate);
-        gdrive_text = v.findViewById(R.id.gdrive_text);
-        gdrive_name = v.findViewById(R.id.gdrive_name);
-
-        GoogleSignIn();
-        ButtonsOnClickListener();
-
+        mGoogleSignInAccount = GoogleSignIn.getLastSignedInAccount(getActivity());
+        updateUI();
         return v;
     }
 
-    private void toggle(CardView card, CardView expandable, ImageView button){
-        if(expandable.getVisibility() == View.GONE){
-            TransitionManager.beginDelayedTransition(gdrive, new AutoTransition());
-            expandable.setVisibility(View.VISIBLE);
-            button.setImageResource(R.drawable.ic_baseline_keyboard_arrow_up_24);
-        } else {
-            TransitionManager.beginDelayedTransition(gdrive, new AutoTransition());
-            expandable.setVisibility(View.GONE);
-            button.setImageResource(R.drawable.ic_baseline_keyboard_arrow_down_24);
+    private void updateUI()
+    {
+        mNumberOfRecordingsText.setText(String.valueOf(CameraLab.get(getActivity()).getNumberOfRecordings()));
+
+        Log.d(Constants.APP_TAG, String.valueOf(mGoogleSignInAccount));
+
+        // Todo: Update YouTube username to be one signed in
+        if (mGoogleSignInAccount != null)
+        {
+            mUserName.setText(mGoogleSignInAccount.getDisplayName());
+            mAccountBtn.setText(R.string.sign_out);
+            Glide.with(getActivity()).load(mGoogleSignInAccount.getPhotoUrl()).into(mProfilePic);
+            mUploadSwitch.setEnabled(true);
+        } else
+        {
+            mUserName.setText(R.string.signed_in_text);
+            mAccountBtn.setText(R.string.sign_in);
+            mProfilePic.setImageResource(R.drawable.ic_profile_user);
+            mUploadSwitch.setEnabled(false);
         }
     }
 
-
-    private void ButtonsOnClickListener(){
-        gdrive.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+        mDeleteAllRecordingsCard.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getContext());
-                if(acct != null){
-                    toggle(gdrive, gdrive_expand, drive_arrow);
-                } else {
-                    GoogleHandleSignIn();
+            public void onClick(View v)
+            {
+                new MaterialAlertDialogBuilder(getContext())
+                        .setTitle("Delete All Recordings")
+                        .setMessage("Warning: This will delete all recordings. Are you sure you want to do this?")
+                        .setPositiveButton("Delete All", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                // Delete all recordings
+                                int numberOfRecordings = CameraLab.get(getActivity()).getNumberOfRecordings();
+                                CameraLab.get(getActivity()).wipeAllData();
+                                dialog.dismiss();
+                                Snackbar.make(view, String.format(
+                                        Locale.getDefault(), "%d recording%s deleted", numberOfRecordings, numberOfRecordings > 1 ? "s" : ""),
+                                        Snackbar.LENGTH_SHORT).show();
+                                updateUI();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which)
+                            {
+                                dialog.dismiss();
+                            }
+                        }).show();
+            }
+        });
+
+        mAccountBtn.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (mGoogleSignInAccount == null)
+                {
+                    // Sign into account
+                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                    startActivityForResult(signInIntent, Constants.REQUEST_ACCOUNT_PICKER);
+                } else
+                {
+                    // Sign out of account
+                    signOut();
                 }
             }
         });
 
-        dropbx.setOnClickListener(new View.OnClickListener() {
+        mPrivacyPolicyCard.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                toggle(dropbx, dropbox_expand, dropbox_arrow);
+            public void onClick(View v)
+            {
+                startActivity(new Intent(getActivity(), PrivacyPolicyActivity.class));
             }
         });
 
-        onedrive.setOnClickListener(new View.OnClickListener() {
+        mTermsAndConditionsCard.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                toggle(onedrive, onedrive_expand, onedrive_arrow);
+            public void onClick(View v)
+            {
+                startActivity(new Intent(getActivity(), TermsConditionsActivity.class));
             }
         });
-
-        youtube.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggle(youtube, youtube_expand, youtube_arrow);
-            }
-        });
-
-        twitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggle(twitch, twitch_expand, twitch_arrow);
-            }
-        });
-
-        privacy_policy.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getActivity(), PrivacyPolicyActivity.class);
-                startActivity(i);
-            }
-        });
-
-        terms_conditions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getActivity(), TermsConditionsActivity.class);
-                startActivity(i);
-            }
-        });
-
-        gdrive_authenticate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               signOut();
-            }
-        });
-
-    }
-
-    private void GoogleHandleSignIn() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
+        if (requestCode == Constants.REQUEST_ACCOUNT_PICKER) {
             // The Task returned from this call is always completed, no need to attach
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
@@ -212,43 +213,38 @@ public class SettingsFragment extends Fragment {
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            mGoogleSignInAccount = completedTask.getResult(ApiException.class);
+
             // Signed in successfully, show authenticated UI.
-            GoogleSignIn();
-            Toast.makeText(getContext(), "Sign in successful", Toast.LENGTH_SHORT).show();
+            updateUI();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w("Error", "signInResult:failed code=" + e.getStatusCode());
-            Toast.makeText(getContext(), "Oops! Something went wrong", Toast.LENGTH_SHORT).show();
+            Log.w(Constants.APP_TAG, "signInResult:failed code=" + e.getStatusCode());
         }
     }
 
-    private void signOut() {
+    private void signOut()
+    {
         mGoogleSignInClient.signOut()
-                .addOnCompleteListener((Activity) getContext(), new OnCompleteListener<Void>() {
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<Void>()
+                {
                     @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Toast.makeText(getContext(), "Successfully signed out", Toast.LENGTH_SHORT).show();
-                        gdrive_text.setText("Sync with Google Drive");
-                        gdrive_expand.setVisibility(View.GONE);
-                        drive_arrow.setVisibility(View.GONE);
-                        drive_arrow.setImageResource(R.drawable.ic_baseline_keyboard_arrow_down_24);
+                    public void onComplete(@NonNull Task<Void> task)
+                    {
+
                     }
                 });
-    }
-    private void GoogleSignIn(){
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(getActivity());
-        if (acct != null) {
-            personName = acct.getDisplayName();
-            personGivenName = acct.getGivenName();
-            personFamilyName = acct.getFamilyName();
-            personEmail = acct.getEmail();
-            gdrive_authenticate.setText("Log out");
-            gdrive_authenticate.setBackgroundColor(Color.parseColor("#FF0000"));
-            gdrive_text.setText(personEmail);
-            drive_arrow.setVisibility(View.VISIBLE);
-            gdrive_name.setText("Signed in as "+ personGivenName + " " + personFamilyName);
-        }
+
+        mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<Void>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task)
+                    {
+                        mGoogleSignInAccount = null;
+                        updateUI();
+                    }
+                });
     }
 }

@@ -17,7 +17,6 @@ public class DeleteDialogFragment extends DialogFragment
 {
     private static DeleteDialogListener mListener;
     private static final String ARG_PLURAL = "plural";
-    private String mPlural;
 
     public static DeleteDialogFragment newInstance(boolean plural, DeleteDialogListener listener)
     {

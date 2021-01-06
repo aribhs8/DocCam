@@ -147,7 +147,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Ca
     @Override
     public void onError(int videoCaptureError, @NonNull String message, @Nullable Throwable cause)
     {
-        Log.e(Constants.appTag, message);
+        Log.e(Constants.APP_TAG, message);
     }
 
     /*==================================================

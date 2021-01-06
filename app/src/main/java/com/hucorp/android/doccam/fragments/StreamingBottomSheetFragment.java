@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.hucorp.android.doccam.Constants;
 import com.hucorp.android.doccam.R;
 
 public class StreamingBottomSheetFragment extends BottomSheetDialogFragment
@@ -55,6 +56,8 @@ public class StreamingBottomSheetFragment extends BottomSheetDialogFragment
             {
                 dismissAllowingStateLoss();
                 Toast.makeText(getContext(), "YouTube button pressed", Toast.LENGTH_SHORT).show();
+                StreamingDialogFragment dialog = StreamingDialogFragment.newInstance(true, "YouTube");
+                dialog.show(getFragmentManager(), Constants.SHEET_STREAM);
             }
         });
 
@@ -65,6 +68,8 @@ public class StreamingBottomSheetFragment extends BottomSheetDialogFragment
             {
                 dismissAllowingStateLoss();
                 Toast.makeText(getContext(), "Twitch button pressed", Toast.LENGTH_SHORT).show();
+                StreamingDialogFragment dialog = StreamingDialogFragment.newInstance(false, "Twitch");
+                dialog.show(getFragmentManager(), Constants.SHEET_STREAM);
             }
         });
     }

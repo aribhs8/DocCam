@@ -38,6 +38,7 @@ import com.hucorp.android.doccam.models.Recording;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class RecordingListFragment extends Fragment
         implements RecyclerViewCallback, OnActionItemClickListener, DeleteDialogListener, SearchView.OnQueryTextListener {
@@ -174,7 +175,7 @@ public class RecordingListFragment extends Fragment
         {
             DeleteDialogFragment dialog = DeleteDialogFragment.newInstance(mMultiSelectList.size() > 1, this);
             assert getFragmentManager() != null;
-            dialog.show(getFragmentManager(), "DeleteDialogFragment");
+            dialog.show(getFragmentManager(), Constants.DIALOG_DELETE);
         }
 
     }
@@ -194,12 +195,13 @@ public class RecordingListFragment extends Fragment
             int position = mRecordings.indexOf(recording);
             mRecordings.remove(position);
             mAdapter.notifyItemRemoved(position);
-            CameraLab.get(getContext()).wipeRecordingData(mContext, recording);
+            CameraLab.get(getContext()).wipeRecordingData(recording);
         }
 
         dialogFragment.dismiss();
         updateLayout();
-        Snackbar.make(mBinding.getRoot(), mMultiSelectList.size() + " recording(s) were deleted", Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mBinding.getRoot(), String.format(
+                Locale.getDefault(), "%d recording%s deleted.", mMultiSelectList.size(), mMultiSelectList.size() > 1 ? "s were" : " was"), Snackbar.LENGTH_SHORT).show();
         mActionMode.forceClose();
     }
 
