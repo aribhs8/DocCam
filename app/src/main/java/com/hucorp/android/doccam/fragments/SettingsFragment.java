@@ -35,6 +35,7 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.youtube.YouTubeScopes;
 import com.hucorp.android.doccam.Constants;
 import com.hucorp.android.doccam.R;
+import com.hucorp.android.doccam.activities.CreditsActivity;
 import com.hucorp.android.doccam.activities.PrivacyPolicyActivity;
 import com.hucorp.android.doccam.activities.TermsConditionsActivity;
 import com.hucorp.android.doccam.helper.CameraLab;
@@ -50,6 +51,7 @@ public class SettingsFragment extends Fragment
     private CardView mDeleteAllRecordingsCard;
     private CardView mPrivacyPolicyCard;
     private CardView mTermsAndConditionsCard;
+    private CardView mCreditsCard;
     private TextView mUserName;
     private Button mAccountBtn;
     private ImageView mProfilePic;
@@ -90,6 +92,7 @@ public class SettingsFragment extends Fragment
         mDeleteAllRecordingsCard = (CardView) v.findViewById(R.id.delete_all_recordings);
         mPrivacyPolicyCard = (CardView) v.findViewById(R.id.privacy_policy);
         mTermsAndConditionsCard = (CardView) v.findViewById(R.id.terms_and_conditions);
+        mCreditsCard = (CardView) v.findViewById(R.id.Credits);
         mAccountBtn = (Button) v.findViewById(R.id.youtube_account_btn);
         mUserName = (TextView) v.findViewById(R.id.youtube_name);
         mProfilePic = (ImageView) v.findViewById(R.id.youtube_profile_pic);
@@ -195,6 +198,17 @@ public class SettingsFragment extends Fragment
                 startActivity(new Intent(getActivity(), TermsConditionsActivity.class));
             }
         });
+
+        mCreditsCard.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                startActivity(new Intent(getActivity(), CreditsActivity.class));
+            }
+        });
+
+
     }
 
     @Override

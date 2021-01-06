@@ -1,8 +1,10 @@
 package com.hucorp.android.doccam.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -191,6 +193,24 @@ public class RecordingListFragment extends Fragment
             dialog.show(getFragmentManager(), "EditDialogFragment");
         }
 
+        else if (item.getItemId() == R.id.action_share){
+
+            ArrayList<Uri> videoUris = new ArrayList<Uri>();
+
+            for (Recording recording : mMultiSelectList){
+
+                recording.getRecordingFileName();
+
+                videoUris.add(FileProvider.getUriForFile(getContext(),"com.hucorp.android.doccam.fileprovider",
+                        CameraLab.get(getActivity()).getRecordingFile(recording)));
+            }
+
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
+            shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, videoUris);
+            shareIntent.setType("video/mp4");
+            startActivity(Intent.createChooser(shareIntent, "Share videos to.."));
+        }
     }
 
     @Override
