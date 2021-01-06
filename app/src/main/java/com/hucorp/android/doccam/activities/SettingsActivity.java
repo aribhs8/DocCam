@@ -9,6 +9,7 @@ public class SettingsActivity extends SingleFragmentActivity
 {
     @Override
     protected Fragment createFragment() {
+        setTitle("Settings");
         return SettingsFragment.newInstance();
     }
 }
