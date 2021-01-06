@@ -28,5 +28,5 @@ public class Constants
     public static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
     public static final String BUTTON_TEXT = "Call YouTube Data API";
     public static final String PREF_ACCOUNT_NAME = "accountName";
-    public static final String[] SCOPES = { YouTubeScopes.YOUTUBE_READONLY };
+    public static final String[] SCOPES = { YouTubeScopes.YOUTUBE_READONLY, YouTubeScopes.YOUTUBE_UPLOAD };
 }

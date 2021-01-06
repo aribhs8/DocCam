@@ -1,5 +1,6 @@
 package com.hucorp.android.doccam.fragments;
 
+import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,19 +31,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.util.ExponentialBackOff;
-import com.google.api.services.youtube.YouTubeScopes;
 import com.hucorp.android.doccam.Constants;
 import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.activities.PrivacyPolicyActivity;
 import com.hucorp.android.doccam.activities.TermsConditionsActivity;
 import com.hucorp.android.doccam.helper.CameraLab;
-import com.hucorp.android.doccam.interfaces.DeleteDialogListener;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Executor;
 
 public class SettingsFragment extends Fragment
 {
@@ -56,7 +52,6 @@ public class SettingsFragment extends Fragment
     private SwitchMaterial mUploadSwitch;
 
     // YouTube
-    GoogleAccountCredential mCredential;
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleSignInAccount mGoogleSignInAccount;
 
@@ -76,6 +71,7 @@ public class SettingsFragment extends Fragment
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestProfile()
+                .requestScopes(new Scope(Constants.SCOPES[0]), new Scope(Constants.SCOPES[1]))
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
@@ -97,14 +93,13 @@ public class SettingsFragment extends Fragment
 
         mGoogleSignInAccount = GoogleSignIn.getLastSignedInAccount(getActivity());
         updateUI();
+
         return v;
     }
 
     private void updateUI()
     {
         mNumberOfRecordingsText.setText(String.valueOf(CameraLab.get(getActivity()).getNumberOfRecordings()));
-
-        Log.d(Constants.APP_TAG, String.valueOf(mGoogleSignInAccount));
 
         // Todo: Update YouTube username to be one signed in
         if (mGoogleSignInAccount != null)
@@ -214,8 +209,14 @@ public class SettingsFragment extends Fragment
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             mGoogleSignInAccount = completedTask.getResult(ApiException.class);
+//            GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(getActivity(), Collections.singleton(Constants.SCOPES[0]));
+//            mService = new YouTube.Builder(
+//                    new NetHttpTransport(),
+//                    new JacksonFactory(),
+//                    credential)
+//                    .setApplicationName(Constants.APP_TAG)
+//                    .build();
 
-            // Signed in successfully, show authenticated UI.
             updateUI();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
