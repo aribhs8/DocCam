@@ -10,6 +10,9 @@
     <color name="gray">#696969</color>
     <color name="transparent">#00000000</color>
     <color name="red">#E60000</color>
+    <color name="dark_red">#B84848</color>
     <color name="light_sky_blue">#CEEEFF</color>
     <color name="dim_black">#99000000</color>
+    <color name="light_gray">#EEEEEE</color>
+    <color name="android_gray">#707070</color>
 </resources>

@@ -1,13 +1,11 @@
 package com.hucorp.android.doccam.helper;
 
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +22,6 @@ import com.hucorp.android.doccam.Constants;
 import com.hucorp.android.doccam.models.Recording;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -63,7 +60,7 @@ public class Camera
                 ProcessCameraProvider cameraProvider = mCameraProviderFuture.get();
                 bindPreview(cameraProvider, context);
             } catch (ExecutionException | InterruptedException e) {
-                Log.e(Constants.appTag, "Critical Error - Camera not working");
+                Log.e(Constants.APP_TAG, "Critical Error - Camera not working");
             }
         }, ContextCompat.getMainExecutor(context));
     }
@@ -129,7 +126,7 @@ public class Camera
             @Override
             public void onError(int videoCaptureError, @NonNull String message, @Nullable Throwable cause)
             {
-                Log.e(Constants.appTag, message);
+                Log.e(Constants.APP_TAG, message);
             }
         });
     }

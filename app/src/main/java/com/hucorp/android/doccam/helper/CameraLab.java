@@ -118,16 +118,25 @@ public class CameraLab
                 new String[] { uuidString });
     }
 
-    public void wipeRecordingData(Context context, Recording recording)
+    public void wipeRecordingData(Recording recording)
     {
         Uri thumbnailUri = FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider",
                 getThumbnailFile(recording));
         Uri recordingUri = FileProvider.getUriForFile(mContext, "com.hucorp.android.doccam.fileprovider",
                 getRecordingFile(recording));
 
-        context.getContentResolver().delete(recordingUri, null, null);
-        context.getContentResolver().delete(thumbnailUri, null, null);
+        mContext.getContentResolver().delete(recordingUri, null, null);
+        mContext.getContentResolver().delete(thumbnailUri, null, null);
         deleteRecording(recording);
+    }
+
+    public void wipeAllData()
+    {
+        List<Recording> recordings = getRecordings();
+        for (Recording recording : recordings)
+        {
+            wipeRecordingData(recording);
+        }
     }
 
     private RecordingCursorWrapper queryRecordings(String whereClause, String[] whereArgs)

@@ -27,10 +27,23 @@
     <string name="dialog_delete_message_plural">Are you sure you want to permanently delete the selected recordings?</string>
     <string name="dialog_delete_message">Are you sure you want to permanently delete the selected recording?</string>
     <string name="no_recordings_title">Well this sucks…</string>
-    <string name="no_recordings_message">It appears that you don\'t have any recordings saved. Go back and make a video!</string>
+    <string name="no_recordings_message">You don\'t have any recordings saved. Go back and make a video!</string>
     <string name="no_recordings_description">No recordings found</string>
     <string name="live_stream">Live Streaming</string>
     <string name="live_stream_sheet_body">Stream to any of the following services</string>
     <string name="youtube">YouTube</string>
     <string name="signed_in_text">Not Signed In</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="sign_in">Sign In</string>
+    <string name="youtube_streaming">YouTube Streaming</string>
+    <string name="storage">Storage</string>
+    <string name="number_of_recordings">Number of Recordings</string>
+    <string name="upload_video_after_stream">Upload video after stream</string>
+    <string name="streaming_quality">Streaming Quality</string>
+    <string name="empty_recordings_list">0</string>
+    <string name="delete_all_recordings">Delete All Recordings</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+    <string name="app_version">DocCam 1.0.0</string>
+    <string name="app_settings_info_label">By using this app, you agree to our Terms of Service and Privacy Policy</string>
 </resources>
