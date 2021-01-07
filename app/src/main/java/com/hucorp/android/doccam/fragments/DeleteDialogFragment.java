@@ -31,17 +31,6 @@ public class DeleteDialogFragment extends DialogFragment
         return fragment;
     }
 
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-        /*
-        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.red));
-        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.gray));
-
-         */
-    }
-
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState)
