@@ -84,7 +84,7 @@
     <Button
         android:id="@+id/tentimer"
         style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="86dp"
+        android:layout_width="90dp"
         android:layout_height="48dp"
         android:backgroundTint="@color/purple_500"
         android:text="@string/ten_timer"
