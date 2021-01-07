@@ -8,8 +8,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -31,6 +34,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.textfield.TextInputLayout;
 import com.hucorp.android.doccam.Constants;
 import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.activities.CreditsActivity;
@@ -52,6 +56,8 @@ public class SettingsFragment extends Fragment
     private Button mAccountBtn;
     private ImageView mProfilePic;
     private SwitchMaterial mUploadSwitch;
+    private AutoCompleteTextView mQuality;
+    private TextInputLayout mQualityDropdown;
 
     // YouTube
     private GoogleSignInClient mGoogleSignInClient;
@@ -93,6 +99,13 @@ public class SettingsFragment extends Fragment
         mUserName = (TextView) v.findViewById(R.id.youtube_name);
         mProfilePic = (ImageView) v.findViewById(R.id.youtube_profile_pic);
         mUploadSwitch = (SwitchMaterial) v.findViewById(R.id.upload_after_stream_switch);
+        mQualityDropdown = (TextInputLayout) v.findViewById(R.id.quality_dropdown);
+
+        mQuality = v.findViewById(R.id.qualityText);
+        String[] qualityOptions = {"1080p", "720p", "480p", "360p"};
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), R.layout.option_item, qualityOptions);
+        mQuality.setText(arrayAdapter.getItem(0).toString(), false);
+        mQuality.setAdapter(arrayAdapter);
 
         mGoogleSignInAccount = GoogleSignIn.getLastSignedInAccount(getActivity());
         updateUI();
@@ -111,12 +124,14 @@ public class SettingsFragment extends Fragment
             mAccountBtn.setText(R.string.sign_out);
             Glide.with(getActivity()).load(mGoogleSignInAccount.getPhotoUrl()).into(mProfilePic);
             mUploadSwitch.setEnabled(true);
+            mQualityDropdown.setEnabled(true);
         } else
         {
             mUserName.setText(R.string.signed_in_text);
             mAccountBtn.setText(R.string.sign_in);
             mProfilePic.setImageResource(R.drawable.ic_profile_user);
             mUploadSwitch.setEnabled(false);
+            mQualityDropdown.setEnabled(false);
         }
     }
 
@@ -202,8 +217,6 @@ public class SettingsFragment extends Fragment
                 startActivity(new Intent(getActivity(), CreditsActivity.class));
             }
         });
-
-
     }
 
     @Override

@@ -46,4 +46,12 @@
     <string name="terms_and_conditions">Terms and Conditions</string>
     <string name="app_version">DocCam 1.0.0</string>
     <string name="app_settings_info_label">By using this app, you agree to our Terms of Service and Privacy Policy</string>
+    <string name="title">Title</string>
+    <string name="privacy">Privacy</string>
+    <string name="quality">Quality</string>
+
+    <string-array name="privacy_array">
+        <item>Public</item>
+        <item>Private</item>
+    </string-array>
 </resources>

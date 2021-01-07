@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.hucorp.android.doccam.Constants;
 import com.hucorp.android.doccam.R;
@@ -55,8 +56,7 @@ public class StreamingBottomSheetFragment extends BottomSheetDialogFragment
             public void onClick(View v)
             {
                 dismissAllowingStateLoss();
-                Toast.makeText(getContext(), "YouTube button pressed", Toast.LENGTH_SHORT).show();
-                StreamingDialogFragment dialog = StreamingDialogFragment.newInstance(true, "YouTube");
+                StreamingDialogFragment dialog = StreamingDialogFragment.newInstance("YouTube");
                 dialog.show(getFragmentManager(), Constants.SHEET_STREAM);
             }
         });
@@ -67,8 +67,7 @@ public class StreamingBottomSheetFragment extends BottomSheetDialogFragment
             public void onClick(View v)
             {
                 dismissAllowingStateLoss();
-                Toast.makeText(getContext(), "Twitch button pressed", Toast.LENGTH_SHORT).show();
-                StreamingDialogFragment dialog = StreamingDialogFragment.newInstance(false, "Twitch");
+                StreamingDialogFragment dialog = StreamingDialogFragment.newInstance("Twitch");
                 dialog.show(getFragmentManager(), Constants.SHEET_STREAM);
             }
         });
