@@ -144,7 +144,7 @@ public class SettingsFragment extends Fragment
             @Override
             public void onClick(View v)
             {
-                new MaterialAlertDialogBuilder(getContext())
+                new MaterialAlertDialogBuilder(getContext(), R.style.DeleteDialogTheme)
                         .setTitle("Delete All Recordings")
                         .setMessage("Warning: This will delete all recordings. Are you sure you want to do this?")
                         .setPositiveButton("Delete All", new DialogInterface.OnClickListener()

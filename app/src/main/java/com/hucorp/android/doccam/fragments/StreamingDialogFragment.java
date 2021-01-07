@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
@@ -18,12 +19,27 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.Data;
+import com.google.api.client.util.DateTime;
+import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.CdnSettings;
+import com.google.api.services.youtube.model.LiveBroadcast;
+import com.google.api.services.youtube.model.LiveBroadcastContentDetails;
+import com.google.api.services.youtube.model.LiveBroadcastSnippet;
+import com.google.api.services.youtube.model.LiveBroadcastStatus;
+import com.google.api.services.youtube.model.LiveStream;
+import com.google.api.services.youtube.model.LiveStreamContentDetails;
+import com.google.api.services.youtube.model.LiveStreamSnippet;
 import com.hucorp.android.doccam.Constants;
 import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.activities.SettingsActivity;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Locale;
 
 public class StreamingDialogFragment extends DialogFragment
@@ -61,7 +77,76 @@ public class StreamingDialogFragment extends DialogFragment
                             @Override
                             public void onClick(DialogInterface dialog, int which)
                             {
+                                /*
                                 // Start live streaming
+                                // Todo: Probably need to create new youtube object with Google Sign in info
+                                GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(getActivity(),
+                                        Collections.singleton(Constants.SCOPES[1]));
+
+                                YouTube youtube = new YouTube.Builder(
+                                        new NetHttpTransport(),
+                                        new JacksonFactory(),
+                                        credential)
+                                        .setApplicationName(Constants.APP_TAG)
+                                        .build();
+
+                                // CREATE BROADCAST
+                                // Get title for stream
+                                String title = ((EditText) v.findViewById(R.id.title)).getText().toString();
+
+                                // Create a snippet with title, scheduled start time
+                                LiveBroadcastSnippet broadcastSnippet = new LiveBroadcastSnippet();
+                                broadcastSnippet.setTitle(title);
+                                broadcastSnippet.setScheduledStartTime(new DateTime(new Date().toString()));
+
+                                // Create LiveBroadCastStatus
+                                LiveBroadcastStatus status = new LiveBroadcastStatus();
+                                // Todo: Change status to be dependent on privacy settings
+                                status.setPrivacyStatus("private");
+
+                                LiveBroadcast broadcast = new LiveBroadcast();
+                                broadcast.setKind("youtube#liveBroadcast");
+                                broadcast.setSnippet(broadcastSnippet);
+
+                                // Create insert request
+                                try
+                                {
+                                    YouTube.LiveBroadcasts.Insert liveBroadcastInsert =
+                                            youtube.liveBroadcasts().insert("snippet,status", broadcast);
+                                    // Request is executed and inserted broadcast is returned
+                                    LiveBroadcast returnedBroadcast = liveBroadcastInsert.execute();
+
+                                    // CREATE STREAM
+                                    LiveStreamSnippet streamSnippet = new LiveStreamSnippet();
+                                    streamSnippet.setTitle(title);
+
+                                    // Create content distribution network with framework and ingestion type
+                                    CdnSettings cdn = new CdnSettings();
+                                    // Todo: Get format from settings fragment
+                                    cdn.setFormat("1080p");
+                                    cdn.setIngestionType("rtmp");
+
+                                    LiveStream stream = new LiveStream();
+                                    stream.setKind("youtube#liveStream");
+                                    stream.setSnippet(streamSnippet);
+                                    stream.setCdn(cdn);
+
+                                    YouTube.LiveStreams.Insert liveStreamInsert =
+                                            youtube.liveStreams().insert("snippet,cdn", stream);
+                                    LiveStream returnedStream = liveStreamInsert.execute();
+
+                                    // Create the bind request
+                                    YouTube.LiveBroadcasts.Bind liveBroadcastBind =
+                                            youtube.liveBroadcasts().bind(returnedBroadcast.getId(), "id,contentDetails");
+
+                                } catch (IOException e)
+                                {
+                                    e.printStackTrace();
+                                }
+
+
+                                 */
+
                                 dialog.dismiss();
                             }
                         })
