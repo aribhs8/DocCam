@@ -1,5 +1,6 @@
 package com.hucorp.android.doccam.fragments;
 
+import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,8 +8,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -30,20 +34,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.switchmaterial.SwitchMaterial;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.util.ExponentialBackOff;
-import com.google.api.services.youtube.YouTubeScopes;
+import com.google.android.material.textfield.TextInputLayout;
 import com.hucorp.android.doccam.Constants;
 import com.hucorp.android.doccam.R;
 import com.hucorp.android.doccam.activities.CreditsActivity;
 import com.hucorp.android.doccam.activities.PrivacyPolicyActivity;
 import com.hucorp.android.doccam.activities.TermsConditionsActivity;
 import com.hucorp.android.doccam.helper.CameraLab;
-import com.hucorp.android.doccam.interfaces.DeleteDialogListener;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Executor;
 
 public class SettingsFragment extends Fragment
 {
@@ -56,9 +56,10 @@ public class SettingsFragment extends Fragment
     private Button mAccountBtn;
     private ImageView mProfilePic;
     private SwitchMaterial mUploadSwitch;
+    private AutoCompleteTextView mQuality;
+    private TextInputLayout mQualityDropdown;
 
     // YouTube
-    GoogleAccountCredential mCredential;
     private GoogleSignInClient mGoogleSignInClient;
     private GoogleSignInAccount mGoogleSignInAccount;
 
@@ -78,6 +79,7 @@ public class SettingsFragment extends Fragment
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestProfile()
+                .requestScopes(new Scope(Constants.SCOPES[0]), new Scope(Constants.SCOPES[1]))
                 .build();
 
         mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
@@ -97,17 +99,23 @@ public class SettingsFragment extends Fragment
         mUserName = (TextView) v.findViewById(R.id.youtube_name);
         mProfilePic = (ImageView) v.findViewById(R.id.youtube_profile_pic);
         mUploadSwitch = (SwitchMaterial) v.findViewById(R.id.upload_after_stream_switch);
+        mQualityDropdown = (TextInputLayout) v.findViewById(R.id.quality_dropdown);
+
+        mQuality = v.findViewById(R.id.qualityText);
+        String[] qualityOptions = {"1080p", "720p", "480p", "360p"};
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getActivity(), R.layout.option_item, qualityOptions);
+        mQuality.setText(arrayAdapter.getItem(0).toString(), false);
+        mQuality.setAdapter(arrayAdapter);
 
         mGoogleSignInAccount = GoogleSignIn.getLastSignedInAccount(getActivity());
         updateUI();
+
         return v;
     }
 
     private void updateUI()
     {
         mNumberOfRecordingsText.setText(String.valueOf(CameraLab.get(getActivity()).getNumberOfRecordings()));
-
-        Log.d(Constants.APP_TAG, String.valueOf(mGoogleSignInAccount));
 
         // Todo: Update YouTube username to be one signed in
         if (mGoogleSignInAccount != null)
@@ -116,12 +124,14 @@ public class SettingsFragment extends Fragment
             mAccountBtn.setText(R.string.sign_out);
             Glide.with(getActivity()).load(mGoogleSignInAccount.getPhotoUrl()).into(mProfilePic);
             mUploadSwitch.setEnabled(true);
+            mQualityDropdown.setEnabled(true);
         } else
         {
             mUserName.setText(R.string.signed_in_text);
             mAccountBtn.setText(R.string.sign_in);
             mProfilePic.setImageResource(R.drawable.ic_profile_user);
             mUploadSwitch.setEnabled(false);
+            mQualityDropdown.setEnabled(false);
         }
     }
 
@@ -207,8 +217,6 @@ public class SettingsFragment extends Fragment
                 startActivity(new Intent(getActivity(), CreditsActivity.class));
             }
         });
-
-
     }
 
     @Override
@@ -228,8 +236,14 @@ public class SettingsFragment extends Fragment
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             mGoogleSignInAccount = completedTask.getResult(ApiException.class);
+//            GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(getActivity(), Collections.singleton(Constants.SCOPES[0]));
+//            mService = new YouTube.Builder(
+//                    new NetHttpTransport(),
+//                    new JacksonFactory(),
+//                    credential)
+//                    .setApplicationName(Constants.APP_TAG)
+//                    .build();
 
-            // Signed in successfully, show authenticated UI.
             updateUI();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
